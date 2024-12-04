@@ -6,6 +6,7 @@ use App\Http\Controllers\RecipeViewerController;
 
 use App\Http\Controllers\ReviewController;
 use App\Models\Recipe;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\UserController;
@@ -21,7 +22,8 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
-        'recipes' => $recipes, // Pass recipes to the view
+        'recipes' => $recipes,
+        'auth' => ['user' => Auth::user()], // Pass authenticated user data
     ]);
 });
 

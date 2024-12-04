@@ -52,7 +52,7 @@
 </svg>
 {{ review.user.name || 'Anonymous' }}
             </p>
-            <p class="text-gray-600 mt-1">Comment: <i>{{ review.Review }}</i></p>
+            <p class="text-gray-600 mt-1"><i>{{ review.Review }}</i></p>
         </div>
         <div class="flex items-center">
             <!-- Stylish Star SVG icons with hover effect -->

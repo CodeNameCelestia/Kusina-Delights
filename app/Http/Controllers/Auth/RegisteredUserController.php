@@ -72,7 +72,7 @@ class RegisteredUserController extends Controller
             Auth::login($user);
 
             // Redirect to the dashboard or any other page
-            return redirect(route('dashboard', absolute: false));
+            return redirect('/');
         } catch (\Exception $e) {
             // Log the exception to the Laravel log file
             Log::error('User registration failed: ' . $e->getMessage(), [

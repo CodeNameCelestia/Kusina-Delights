@@ -46,18 +46,23 @@
     <div v-for="(review, index) in recipe.reviews" :key="index" class="bg-white rounded-lg p-4 flex justify-between items-start shadow-sm">
         <div>
             <p class="flex items-center text-gray-700 font-bold">
-                <span class="material-icons mr-2 text-yellow-500">person</span> {{ review.user.name || 'Anonymous' }}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="text-gray-500">
+  <circle cx="12" cy="8" r="4" class="fill-current text-gray-600"/>
+  <path d="M12 14c-4 0-6 2-6 3v1h12v-1c0-1-2-3-6-3z" class="fill-current text-gray-600"/>
+</svg>
+{{ review.user.name || 'Anonymous' }}
             </p>
-            <p class="text-gray-600 mt-1">{{ review.Review }}</p>
+            <p class="text-gray-600 mt-1">Comment: <i>{{ review.Review }}</i></p>
         </div>
         <div class="flex items-center">
-            <!-- SVG Star icons with hover effect -->
+            <!-- Stylish Star SVG icons with hover effect -->
             <svg v-for="star in 5" :key="star" :class="{'fill-yellow-500': review.Star >= star, 'fill-gray-300': review.Star < star, 'cursor-pointer': true, 'hover:fill-yellow-400': true, 'transition-colors': true}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                <path :d="review.Star >= star ? 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z' : 'M12 15.4l3.76 2.28-1-4.17 3.27-2.84-4.28-.38L12 4.75l-1.75 5.68-4.28.38 3.27 2.84-1 4.17z'"></path>
+                <path :d="review.Star >= star ? 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z' : 'M12 15.4l3.76 2.28-1-4.17 3.27-2.84-4.28-.38L12 4.75l-1.75 5.68-4.28.38 3.27 2.84-1 4.17z'"/>
             </svg>
         </div>
     </div>
 </div>
+
 
 
 <!-- Add Review Section -->

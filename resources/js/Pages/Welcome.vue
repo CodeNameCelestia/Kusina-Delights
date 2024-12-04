@@ -29,7 +29,7 @@
               </p>
             </div>
             <div class="mt-4 flex items-center justify-between">
-              <a :href="`/recipes/${recipe.RecipeID}`">
+              <a :href="`api/recipes/${recipe.RecipeID}`">
                 <button class="bg-yellow-300 text-black-100 font-bold py-1 px-4 rounded-full text-small font-semibold hover:bg-yellow-500 focus:outline-none focus:ring focus:ring-yellow-300">
                   View Recipe
                 </button>

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\RecipeViewerController;
+
 use App\Http\Controllers\ReviewController;
 use App\Models\Recipe;
 
@@ -55,10 +57,17 @@ Route::get('/2', function () {
     return Inertia::render('Webpages/AboutUs');  // Path relative to 'resources/js/Pages/'
 });
 
+
+
+
+
 Route::get('/3', function () {
-    return Inertia::render('Webpages/ViewRecipe');  // Path relative to 'resources/js/Pages/'
+    return Inertia::render('Webpages/sample');  // Path relative to 'resources/js/Pages/'
 });
 
+Route::get('api/recipes/{id}', [RecipeViewerController::class, 'show']);
+Route::get('api/recipes/{id}/reviews', [RecipeViewerController::class, 'getReviews']);
+Route::post('api/recipes/{id}/reviews', [RecipeViewerController::class, 'storeReview']);
 
 
 

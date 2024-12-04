@@ -21,12 +21,18 @@
           <form action="#" method="GET" class="flex items-center bg-gray-100 border border-gray-300 rounded-3xl px-2 py-2">
             <button type="submit" class="text-gray-600 px-4">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-                  <circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="2" />
-                  <line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="2" />
+                <line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
               </svg>
             </button>
-            <input type="text" name="search" placeholder="Search..." class=" text-small px-2 w-40" />
+            <input
+              type="text"
+              name="search"
+              placeholder="Search..."
+              class="text-small px-2 w-40 bg-transparent outline-none focus:outline-none focus:ring-0 border-none placeholder-gray-500"
+            />
           </form>
+
         </div>
       </div>
     </header>

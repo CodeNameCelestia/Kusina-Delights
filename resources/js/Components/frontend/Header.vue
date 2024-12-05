@@ -68,19 +68,29 @@
           <!-- Recipe Dropdown Menu -->
           <div
             v-if="recipes.length && recipeDropdownOpen"
-            class="absolute mt-32 w-[30vh] bg-white border border-gray-200 rounded shadow-lg z-50"
+            class="absolute w-[28vh] bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-72 overflow-y-auto transition-all duration-300 ease-in-out"
+            :style="{
+              top: `${dropdownTopPosition}px`,
+              left: '2vh',
+            }"
           >
             <a
               v-for="recipe in filteredRecipes"
               :key="recipe.RecipeID"
               :href="`/api/recipes/${recipe.RecipeID}`"
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-4"
+              class="block px-4 py-3 text-sm text-gray-700 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200 ease-in-out flex items-center space-x-4"
             >
               <!-- Display the recipe photo if it exists -->
-              <img v-if="recipe.RecipePhoto" :src="recipe.RecipePhoto" alt="Recipe Image" class="h-10 w-10 object-cover rounded-full" />
+              <img
+                v-if="recipe.RecipePhoto"
+                :src="recipe.RecipePhoto"
+                alt="Recipe Image"
+                class="h-10 w-10 object-cover rounded-full"
+              />
               <span>{{ recipe.RecipeTitle }}</span>
             </a>
           </div>
+
 
         </div>
       </div>
@@ -90,15 +100,17 @@
 
 <script>
 import axios from 'axios';
+import { debounce } from 'lodash'; // Import lodash debounce function
 
 export default {
   data() {
     return {
-      logo: '/storage/logo3.png', // Adjust this based on your public path
+      logo: '/storage/logo3.png',
       searchQuery: '',
       recipes: [],
       userDropdownOpen: false,
       recipeDropdownOpen: false,
+      dropdownTopPosition: 0, // To dynamically control the dropdown position
     };
   },
   computed: {
@@ -109,15 +121,7 @@ export default {
     },
   },
   watch: {
-    searchQuery(newQuery) {
-      // If the search query is empty, clear recipes and close dropdown
-      if (newQuery.trim() === '') {
-        this.recipes = [];
-        this.toggleRecipeDropdown(false);
-      } else {
-        this.fetchRecipes(newQuery); // Fetch recipes if search query is not empty
-      }
-    },
+    searchQuery: 'debouncedFetchRecipes', // Watch for changes in the searchQuery
   },
   methods: {
     toggleUserDropdown() {
@@ -125,35 +129,42 @@ export default {
     },
     toggleRecipeDropdown(state) {
       this.recipeDropdownOpen = state;
+      this.updateDropdownPosition(); // Update position whenever dropdown state changes
     },
     logout() {
-      // Send a POST request to the Laravel logout route
       this.$inertia.post('/logout');
     },
     async fetchRecipes(query) {
+      const trimmedQuery = query.trim();
+      if (!trimmedQuery) {
+        this.recipes = [];
+        this.toggleRecipeDropdown(false);
+        return;
+      }
+
       try {
         const { data } = await axios.get('/api/recipes', {
-          params: { search: query },
+          params: { search: trimmedQuery },
         });
         this.recipes = data;
-        this.toggleRecipeDropdown(data.length > 0); // Open dropdown if there are recipes
+        this.toggleRecipeDropdown(data.length > 0);
       } catch (error) {
         console.error('Error fetching recipes:', error);
-        this.toggleRecipeDropdown(false); // Close the dropdown if there's an error
+        this.toggleRecipeDropdown(false);
       }
     },
+    debouncedFetchRecipes: debounce(function(query) {
+      this.fetchRecipes(query);
+    }, 300), // Adjust debounce time as needed (in ms)
+
+    // Method to calculate dropdown position dynamically
+    updateDropdownPosition() {
+      const inputElement = this.$el.querySelector('input');
+      if (inputElement) {
+        const inputRect = inputElement.getBoundingClientRect();
+        this.dropdownTopPosition = inputRect.bottom + window.scrollY - 65; // Position the dropdown below the search bar
+      }
+    }
   },
 };
 </script>
-
-
-
-<style scoped>
-.recipe-image {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-</style>

@@ -60,7 +60,7 @@
                 </span>
               </template>
               <template v-else>
-                <span class="text-gray-500 text-small italic">Not reviewed yet</span>
+                <span class="text-gray-500 text-[15px] italic">Not reviewed yet</span>
               </template>
             </div>
           </div>

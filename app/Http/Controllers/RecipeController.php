@@ -159,20 +159,24 @@ class RecipeController extends Controller
     public function search(Request $request)
     {
         $search = $request->input('search');
+        
         $recipes = Recipe::query()
-            ->when($search, fn ($query) => $query->where('RecipeTitle', 'like', "%{$search}%"))
+            ->when($search, function ($query) use ($search) {
+                return $query->where('RecipeTitle', 'like', "%{$search}%");
+            })
             ->limit(10) // Limit the results to avoid performance issues
-            ->get(['RecipeID', 'RecipeTitle', 'RecipePhoto']); // Include RecipePhoto
-    
-        // If there's a recipe photo, convert it to a full URL path
+            ->get(['RecipeID', 'RecipeTitle', 'RecipePhoto']); // Only select needed fields
+        
+        // Only add full URL to RecipePhoto if it's set
         $recipes->each(function ($recipe) {
             if ($recipe->RecipePhoto) {
-                $recipe->RecipePhoto = asset('storage/' . $recipe->RecipePhoto); // Generate full URL
+                $recipe->RecipePhoto = asset('storage/' . $recipe->RecipePhoto);
             }
         });
     
         return response()->json($recipes);
     }
+    
     
 
 }

@@ -16,14 +16,28 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $recipes = Recipe::take(3)->get(); // Limit to 3 recipes or adjust as needed
+    $recipes = Recipe::withCount('reviews')
+        ->withAvg('reviews', 'Star')
+        ->take(3)
+        ->get()
+        ->map(function ($recipe) {
+            return [
+                'RecipeID' => $recipe->RecipeID,
+                'RecipeTitle' => $recipe->RecipeTitle,
+                'Description' => $recipe->Description,
+                'RecipePhoto' => $recipe->RecipePhoto,
+                'averageStars' => $recipe->reviews_avg_star,
+                'reviewCount' => $recipe->reviews_count,
+            ];
+        });
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
         'recipes' => $recipes,
-        'auth' => ['user' => Auth::user()], // Pass authenticated user data
+        'auth' => ['user' => Auth::user()],
     ]);
 });
 
@@ -70,6 +84,7 @@ Route::get('/3', function () {
 Route::get('api/recipes/{id}', [RecipeViewerController::class, 'show']);
 Route::get('api/recipes/{id}/reviews', [RecipeViewerController::class, 'getReviews']);
 Route::post('api/recipes/{id}/reviews', [RecipeViewerController::class, 'storeReview']);
+Route::get('api/recipes', [RecipeController::class, 'search']);
 
 
 

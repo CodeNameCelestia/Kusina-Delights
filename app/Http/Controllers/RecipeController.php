@@ -155,4 +155,24 @@ class RecipeController extends Controller
         // Redirect to the recipe index page
         return redirect()->route('recipes.index');
     }
+
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+        $recipes = Recipe::query()
+            ->when($search, fn ($query) => $query->where('RecipeTitle', 'like', "%{$search}%"))
+            ->limit(10) // Limit the results to avoid performance issues
+            ->get(['RecipeID', 'RecipeTitle', 'RecipePhoto']); // Include RecipePhoto
+    
+        // If there's a recipe photo, convert it to a full URL path
+        $recipes->each(function ($recipe) {
+            if ($recipe->RecipePhoto) {
+                $recipe->RecipePhoto = asset('storage/' . $recipe->RecipePhoto); // Generate full URL
+            }
+        });
+    
+        return response()->json($recipes);
+    }
+    
+
 }

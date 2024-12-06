@@ -137,11 +137,7 @@ class RecipeController extends Controller
         }
     }
     
-    
-    
-    
 
-    // Delete a recipe from the database
     public function destroy(Recipe $recipe)
     {
         // Delete the recipe's photo if it exists
@@ -156,6 +152,8 @@ class RecipeController extends Controller
         return redirect()->route('recipes.index');
     }
 
+
+    //SEARCH BAR
     public function search(Request $request)
     {
         $search = $request->input('search');
@@ -176,6 +174,28 @@ class RecipeController extends Controller
     
         return response()->json($recipes);
     }
+
+    //Recipes filter
+
+    public function recipeFilter()
+    {
+        // Fetch Famous Filipino Delights: Recipes with highest average rating and reviews
+        $famousDelights = Recipe::withCount('reviews')
+            ->withAvg('reviews', 'star') // Get average rating
+            ->orderByDesc('reviews_count')
+            ->orderByDesc('reviews_avg_star') // First by reviews count, then by average rating
+            ->take(3) // Limit to top 3
+            ->get();
+
+        // Fetch Recent Recipes: Sorted by creation date (most recent first)
+        $recentRecipes = Recipe::latest()->take(3)->get(); // Limit to top 3 most recent
+
+        return Inertia::render('Webpages/Recipes', [
+            'famousDelights' => $famousDelights,
+            'recentRecipes' => $recentRecipes
+        ]);
+    }
+
     
     
 

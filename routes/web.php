@@ -65,9 +65,9 @@ Route::resource('recipes', RecipeController::class);
 Route::resource('reviews', ReviewController::class);
 
 
-Route::get('/1', function () {
-    return Inertia::render('Webpages/Recipes');  // Path relative to 'resources/js/Pages/'
-});
+Route::get('/1', [RecipeController::class, 'recipeFilter']);
+
+
 
 Route::get('/2', function () {
     return Inertia::render('Webpages/AboutUs');  // Path relative to 'resources/js/Pages/'
@@ -85,6 +85,8 @@ Route::get('api/recipes/{id}', [RecipeViewerController::class, 'show']);
 Route::get('api/recipes/{id}/reviews', [RecipeViewerController::class, 'getReviews']);
 Route::post('api/recipes/{id}/reviews', [RecipeViewerController::class, 'storeReview']);
 Route::get('api/recipes', [RecipeController::class, 'search']);
+
+Route::get('/1', [RecipeController::class, 'recipeFilter']);
 
 
 

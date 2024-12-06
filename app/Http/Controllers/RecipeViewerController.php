@@ -3,23 +3,47 @@ namespace App\Http\Controllers;
 
 use App\Models\Recipe;
 use App\Models\Review;
+use App\Models\RecipeView;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;  // Import the Log facade
+
 use Inertia\Inertia;
 
 class RecipeViewerController extends Controller
 {
     public function show($id)
     {
-        // Fetch the recipe by ID with reviews (and optionally, user data)
+        // Fetch the recipe along with its reviews and users
         $recipe = Recipe::with('reviews.user')->findOrFail($id);
-        
-        // Return the Inertia response with the recipe data
+    
+        // Track views
+        $sessionId = Session::getId(); // Get the current session ID
+        $viewExists = RecipeView::where('recipe_id', $id)
+            ->where('session_id', $sessionId)
+            ->exists();
+    
+        if (!$viewExists) {
+            RecipeView::create([
+                'recipe_id' => $id,
+                'session_id' => $sessionId,
+            ]);
+        }
+    
+        // Get the total view count for the recipe
+        $viewCount = RecipeView::where('recipe_id', $id)->count();
+        Log::info("View count for recipe {$id}: " . $viewCount);
+
+        // Return the view
         return Inertia::render('Webpages/ViewRecipe', [
             'recipe' => $recipe,
+            'viewCount' => $viewCount, // Pass the view count to the frontend
         ]);
     }
     
+   
+
     public function getReviews($id)
     {
         $reviews = Review::where('recipe_id', $id)->get(); // Get reviews for the recipe

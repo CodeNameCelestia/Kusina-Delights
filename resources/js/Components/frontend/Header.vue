@@ -9,8 +9,8 @@
 
       <nav class="hidden md:flex space-x-6 font-bold text-normal">
         <a href="/" class="hover:text-gray-500">Home</a>
-        <a href="/1" class="hover:text-gray-500">Recipes</a>
-        <a href="/2" class="hover:text-gray-500">About Us</a>
+        <a href="/allrecipes" class="hover:text-gray-500">Recipes</a>
+        <a href="/aboutus" class="hover:text-gray-500">About Us</a>
       </nav>
 
       <div class="flex flex-col items-end space-y-2">

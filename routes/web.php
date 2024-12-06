@@ -39,59 +39,61 @@ Route::get('/', function () {
         'recipes' => $recipes,
         'auth' => ['user' => Auth::user()],
     ]);
-});
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-Route::resource('users', UserController::class);
+})->name('home');
 
 
 
+
+#Storage
 Route::get('/storage/{file}', function ($file) {
     return response()->file(storage_path("app/public/{$file}"));
 })->name('storage');
 
 
+# Crud for admin and backend shiz
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 Route::resource('users', UserController::class);
 Route::resource('recipes', RecipeController::class);
 Route::resource('reviews', ReviewController::class);
 
 
-Route::get('/1', [RecipeController::class, 'recipeFilter']);
-
-
-
-Route::get('/2', function () {
+# Views and filters for front end
+Route::get('/allrecipes', [RecipeController::class, 'recipeFilter']);
+Route::get('/aboutus', function () {
     return Inertia::render('Webpages/AboutUs');  // Path relative to 'resources/js/Pages/'
 });
-
-
-
-
-
-Route::get('/3', function () {
-    return Inertia::render('Webpages/sample');  // Path relative to 'resources/js/Pages/'
-});
-
 Route::get('api/recipes/{id}', [RecipeViewerController::class, 'show']);
 Route::get('api/recipes/{id}/reviews', [RecipeViewerController::class, 'getReviews']);
 Route::post('api/recipes/{id}/reviews', [RecipeViewerController::class, 'storeReview']);
 Route::get('api/recipes', [RecipeController::class, 'search']);
 
-Route::get('/1', [RecipeController::class, 'recipeFilter']);
+
+
+
+Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+Route::post('/update-introduction', [ProfileController::class, 'updateIntroduction'])->name('update.introduction');
 
 
 
 
+#Samples
+Route::get('/1', function () {
+    return Inertia::render('Chef/Profile');  // Path relative to 'resources/js/Pages/'
+});
 
+Route::get('/2', function () {
+    return Inertia::render('Chef/Profile_edit');  // Path relative to 'resources/js/Pages/'
+});
+
+Route::get('/3', function () {
+    return Inertia::render('Chef/Dashboard');  // Path relative to 'resources/js/Pages/'
+});
+
+Route::get('/4', function () {
+    return Inertia::render('Chef/Create_post');  // Path relative to 'resources/js/Pages/'
+});
 
 
 require __DIR__.'/auth.php';

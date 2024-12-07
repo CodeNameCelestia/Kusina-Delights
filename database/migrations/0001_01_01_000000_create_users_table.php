@@ -64,6 +64,11 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // Add a full-text index to the RecipeTitle column
+        Schema::table('recipes', function (Blueprint $table) {
+            $table->fullText('RecipeTitle'); // Add fulltext index on RecipeTitle
+        });
+
         Schema::create('reviews', function (Blueprint $table) {
             $table->id('ReviewsID');
             $table->foreignId('user_id')
@@ -92,6 +97,10 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+
+        
+        
     }
 
     /**
@@ -99,6 +108,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('recipes', function (Blueprint $table) {
+            $table->dropFullText(['RecipeTitle']); // Drop fulltext index if rolling back
+        });
+        
         Schema::dropIfExists('reviews');
         Schema::dropIfExists('recipes');
         Schema::dropIfExists('chefs');

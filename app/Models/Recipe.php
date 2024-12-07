@@ -26,6 +26,16 @@ class Recipe extends Model
         'Servings',
     ];
 
+    public function views()
+    {
+        return $this->hasMany(RecipeView::class, 'recipe_id', 'RecipeID');
+    }
+
+    public function viewCount()
+    {
+        return $this->views()->count();
+    }
+
     public function chef()
     {
         return $this->belongsTo(Chef::class, 'chef_id', 'ChefID');

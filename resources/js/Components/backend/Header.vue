@@ -52,11 +52,8 @@ import { Link } from '@inertiajs/vue3';
                             </template>
 
                             <template #content>
-                                <DropdownLink
-                                    :href="route('profile.edit')"
-                                >
-                                    Profile
-                                </DropdownLink>
+                                <DropdownLink :href="route('home')" class="hover:text-gray-500">Home</DropdownLink>
+
                                 <DropdownLink
                                     :href="route('logout')"
                                     method="post"

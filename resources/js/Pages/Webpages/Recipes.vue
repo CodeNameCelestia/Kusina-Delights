@@ -17,7 +17,7 @@
         </p>
         <div class="flex flex-wrap justify-center gap-10">
           <div v-for="(recipe, index) in famousDelights" :key="index" class="max-w-[403px] bg-white rounded-tr-[40px] rounded-tl-[50px] shadow-lg overflow-hidden flex flex-col">
-            <div class="w-[40vh] h-[250px] overflow-hidden">
+            <div class="w-[45vh] h-[250px] overflow-hidden">
           <img
             :src="recipe.RecipePhoto ? `/storage/${recipe.RecipePhoto}` : 'https://via.placeholder.com/403x212'"
             class="w-full h-full object-cover"
@@ -49,7 +49,9 @@
                         </svg>
                       </template>
                     </div>
-                    <span v-else class="text-gray-600">Not reviewed yet</span>
+                    <template v-else>
+                <span class="text-gray-500 text-[15px] italic">Not reviewed yet</span>
+              </template>
                   </span>
                 </div>
               </div>

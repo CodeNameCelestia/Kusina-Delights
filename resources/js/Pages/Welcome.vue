@@ -21,7 +21,7 @@
         class="max-w-[403px] bg-white rounded-tr-[40px] rounded-tl-[50px] shadow-lg overflow-hidden flex flex-col"
       >
         <!-- Fixed image size -->
-        <div class="w-[40vh] h-[250px] overflow-hidden">
+        <div class="w-[45vh] h-[250px] overflow-hidden">
           <img
             :src="recipe.RecipePhoto ? `/storage/${recipe.RecipePhoto}` : 'https://via.placeholder.com/403x212'"
             class="w-full h-full object-cover"

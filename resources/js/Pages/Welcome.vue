@@ -21,7 +21,7 @@
         class="max-w-[403px] bg-white rounded-tr-[40px] rounded-tl-[50px] shadow-lg overflow-hidden flex flex-col"
       >
         <!-- Fixed image size -->
-        <div class="w-[50vh] h-[212px] overflow-hidden">
+        <div class="w-[40vh] h-[250px] overflow-hidden">
           <img
             :src="recipe.RecipePhoto ? `/storage/${recipe.RecipePhoto}` : 'https://via.placeholder.com/403x212'"
             class="w-full h-full object-cover"
@@ -31,7 +31,7 @@
         <div class="p-4 flex flex-col justify-between h-[262px]">
           <div>
             <h2 class="text-large font-semibold text-gray-800">{{ recipe.RecipeTitle }}</h2>
-            <p class="mt-2 text-gray-600 text-small">
+            <p class="mt-2 text-gray-600 text-small line-clamp-3">
               {{ recipe.Description || 'No description available.' }}
             </p>
           </div>

@@ -17,11 +17,17 @@
         </p>
         <div class="flex flex-wrap justify-center gap-10">
           <div v-for="(recipe, index) in famousDelights" :key="index" class="max-w-[403px] bg-white rounded-tr-[40px] rounded-tl-[50px] shadow-lg overflow-hidden flex flex-col">
-            <img class="w-[50vh] h-[212px] overflow-hidden" :src="recipe.RecipePhoto ? `/storage/${recipe.RecipePhoto}` : 'https://via.placeholder.com/403x212'" :alt="recipe.RecipeTitle">
+            <div class="w-[40vh] h-[250px] overflow-hidden">
+          <img
+            :src="recipe.RecipePhoto ? `/storage/${recipe.RecipePhoto}` : 'https://via.placeholder.com/403x212'"
+            class="w-full h-full object-cover"
+            :alt="recipe.RecipeTitle"
+          >
+        </div>
             <div class="p-4 flex flex-col justify-between h-[262px]">
               <div>
                 <h2 class="text-large font-semibold text-gray-800">{{ recipe.RecipeTitle }}</h2>
-                <p class="mt-2 text-gray-600 text-small">{{ recipe.Description }}</p>
+                <p class="mt-2 text-gray-600 text-small line-clamp-3">{{ recipe.Description }}</p>
               </div>
               <div class="mt-4 flex items-center justify-between">
                 <a :href="`api/recipes/${recipe.RecipeID}`">
@@ -57,7 +63,13 @@
       <div class=" flex flex-col items-center mb-10">
 
         <div v-for="(recipe, index) in recentRecipes" :key="index" class="bg-gray-50 rounded-lg flex items-center w-[98%] max-w-screen-xl mb-10">
-            <img :src="recipe.RecipePhoto ? `/storage/${recipe.RecipePhoto}` : 'https://via.placeholder.com/403x212'" :alt="recipe.RecipeTitle" class="w-[45vh] h-[45vh] rounded-l-lg object-cover">
+          <div class="w-[40vh] h-[300px] overflow-hidden">
+          <img
+            :src="recipe.RecipePhoto ? `/storage/${recipe.RecipePhoto}` : 'https://via.placeholder.com/403x212'"
+            class="w-full h-full object-cover"
+            :alt="recipe.RecipeTitle"
+          >
+        </div>
             <div class="flex-1 p-[2.2vh]   rounded-r-lg" style="background-color: rgba(255, 204, 0, 0.4);">
                 <h3 class="text-large font-bold mt-4 mb-4 ml-10 text-black-100">{{ recipe.RecipeTitle }}</h3>
                 <p class="text-gray-600 text-normal py-12 ml-10">{{ recipe.Description }}</p>

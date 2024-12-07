@@ -13,9 +13,10 @@
         <a href="/aboutus" class="hover:text-gray-500">About Us</a>
       </nav>
 
-      <div class="flex flex-col items-end space-y-2">
+      <!-- Centered Login/Sign Up & Search Bar Section -->
+      <div class="flex flex-col items-center space-y-2">
         <!-- Authenticated user dropdown -->
-        <div v-if="$page.props.auth.user" class="relative">
+        <div v-if="$page.props.auth.user" class="relative text-center">
           <button 
             @click="toggleUserDropdown" 
             class="flex items-center space-x-2 text-sm font-bold text-small hover:text-gray-500 focus:outline-none"
@@ -29,12 +30,12 @@
           <!-- User Dropdown Menu -->
           <div 
             v-if="userDropdownOpen" 
-            class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50"
+            class="absolute right-0.5 left-0.5 mt-2 w-45 bg-white border border-gray-200 rounded shadow-lg z-50"
           >
             <a href="/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
             <button 
               @click="logout" 
-              class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              class="w-full block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-center"
             >
               Logout
             </button>
@@ -110,7 +111,7 @@ export default {
       recipes: [],
       userDropdownOpen: false,
       recipeDropdownOpen: false,
-      dropdownTopPosition: 0, // To dynamically control the dropdown position
+      dropdownTopPosition: 0,
     };
   },
   computed: {
@@ -121,15 +122,33 @@ export default {
     },
   },
   watch: {
-    searchQuery: 'debouncedFetchRecipes', // Watch for changes in the searchQuery
+    searchQuery: 'debouncedFetchRecipes',
   },
   methods: {
     toggleUserDropdown() {
       this.userDropdownOpen = !this.userDropdownOpen;
     },
+    closeUserDropdown() {
+      this.userDropdownOpen = false;
+    },
     toggleRecipeDropdown(state) {
       this.recipeDropdownOpen = state;
-      this.updateDropdownPosition(); // Update position whenever dropdown state changes
+      this.updateDropdownPosition();
+    },
+    closeRecipeDropdown() {
+      this.recipeDropdownOpen = false;
+    },
+    handleClickOutside(event) {
+      // Check if the click is outside the dropdown or related buttons
+      const dropdown = this.$el.querySelector('.relative.text-center');
+      const searchDropdown = this.$el.querySelector('.relative.flex.items-center');
+
+      if (dropdown && !dropdown.contains(event.target)) {
+        this.closeUserDropdown();
+      }
+      if (searchDropdown && !searchDropdown.contains(event.target)) {
+        this.closeRecipeDropdown();
+      }
     },
     logout() {
       this.$inertia.post('/logout');
@@ -153,18 +172,23 @@ export default {
         this.toggleRecipeDropdown(false);
       }
     },
-    debouncedFetchRecipes: debounce(function(query) {
+    debouncedFetchRecipes: debounce(function (query) {
       this.fetchRecipes(query);
-    }, 300), // Adjust debounce time as needed (in ms)
-
-    // Method to calculate dropdown position dynamically
+    }, 300),
     updateDropdownPosition() {
       const inputElement = this.$el.querySelector('input');
       if (inputElement) {
         const inputRect = inputElement.getBoundingClientRect();
-        this.dropdownTopPosition = inputRect.bottom + window.scrollY - 65; // Position the dropdown below the search bar
+        this.dropdownTopPosition = inputRect.bottom + window.scrollY - 65;
       }
-    }
+    },
+  },
+  mounted() {
+    document.addEventListener('click', this.handleClickOutside);
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside);
   },
 };
+
 </script>

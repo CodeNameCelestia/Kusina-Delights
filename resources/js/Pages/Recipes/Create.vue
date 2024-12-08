@@ -40,7 +40,7 @@
       <!-- Preparation Time -->
       <div>
         <label for="Preparation" class="block text-gray-700 font-medium">Preparation Time (minutes)</label>
-        <input v-model="form.Preparation" type="text" id="Preparation" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+        <input v-model="form.Preparation" type="number" id="Preparation" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:outline-none" />
       </div>
 
       <!-- Cooking Time -->
@@ -52,7 +52,11 @@
       <!-- Difficulty -->
       <div>
         <label for="Difficulty" class="block text-gray-700 font-medium">Difficulty</label>
-        <input v-model="form.Difficulty" type="text" id="Difficulty" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:outline-none" />
+        <select v-model="form.Difficulty" id="Difficulty" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:outline-none">
+          <option value="Easy">Easy</option>
+          <option value="Medium">Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
       </div>
 
       <!-- Servings -->

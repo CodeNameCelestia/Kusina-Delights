@@ -34,7 +34,7 @@
             <div>
                 <p class="text-small font-bold">How To Prepare</p>
    
-                <ol class="list-decimal pl-5 space-y-2">
+                <ol class="list-decimal pl-5 space-y-2 text-justify">
                     <li v-for="(step, index) in recipe.Instructions.split('\n')" :key="index">
                         {{ step.trim() }}
                     </li>
@@ -53,7 +53,7 @@
             <!-- Description -->
             <div>
                 <p class="font-bold">Description</p>
-                <p>{{ recipe.Description }}</p>
+                <p class="text-justify">{{ recipe.Description }}</p>
             </div>
         </div>
 

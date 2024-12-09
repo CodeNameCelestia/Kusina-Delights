@@ -63,13 +63,15 @@ class User extends Authenticatable
     }
 
     /**
+    /**
      * Check if the user has a chef role.
+     * 
+     * @return bool
      */
     public function isChef()
     {
         return $this->Roles === 'chef';
     }
-
     /**
      * Check if the user has a user role.
      */

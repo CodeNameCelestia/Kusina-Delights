@@ -16,8 +16,8 @@
             <div
               class="bg-yellow-300 w-full h-[80vh] sm:w-1/3 p-12 rounded-[2rem] shadow-[5px_5px_15px_rgba(0,0,0,0.5)] relative"
             >
-              <div class="absolute top-6 right-6 text-black-100cursor-pointer">
-                <a href="/profile_edit">
+              <div class="absolute top-6 right-6 text-black-100 cursor-pointer">
+                <a href="/profile/edit">
                   <i class="fas fa-pen text-4xl"></i>
                 </a>
               </div>
@@ -38,17 +38,32 @@
                   </p>
                 </div>
               </div>
-              <DropdownLink
-                    :href="route('logout')"
-                    method="post"
-                    as="button"
-                    class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small"
-                >
-                    Log out
-                </DropdownLink>
 
+              <!-- Buttons Container -->
+              <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col space-y-4">
+                <a
+                  href="/dashboard"
+                  class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
+                >
+                  Admin Dasboard
+                </a>
+
+                <a
+                  href="/chef/dashboard"
+                  class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
+                >
+                  Chef Dasboard
+                </a>
+
+                <button
+                  @click="logout"
+                  class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
-  
+
             <!-- Bio and History Section -->
             <div class="flex flex-col w-full sm:w-2/3 gap-12">
               <!-- Bio Section -->
@@ -77,7 +92,7 @@
   
               <!-- History Section -->
               <div class="bg-yellow-300 p-10 rounded-lg shadow-md rounded-[2.3rem] shadow-[5px_5px_15px_rgba(0,0,0,0.5)]">
-                <h2 class="font-semibold text-3xl text-black-100 mb-8 border-b-2 border-black-100 pb-4">History:</h2>
+                <h2 class="font-semibold text-3xl text-black-100 mb-8 border-b-2 border-black-100 pb-4">Review History:</h2>
                 <ul class="space-y-8">
                   <li v-if="typeof reviews === 'string'" class="text-sm text-black-100">{{ reviews }}</li>
                   <li v-else v-for="(review, index) in reviews" :key="index" class="flex items-start gap-6 transition-transform transform hover:scale-105">
@@ -156,7 +171,9 @@
     // Save to backend
     updateIntroduction(newIntroduction.value);
   }
-  
+  function logout() {
+      this.$inertia.post('/logout');
+  }
   // Method to call the backend API to save the introduction
   function updateIntroduction(introduction) {
     axios.post('/update-introduction', { introduction })

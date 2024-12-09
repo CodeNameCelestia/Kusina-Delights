@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\RecipeViewerController;
+use App\Http\Controllers\ChefDashboardController;
 
 use App\Http\Controllers\ReviewController;
 use App\Models\Recipe;
@@ -71,10 +72,32 @@ Route::get('api/recipes', [RecipeController::class, 'search']);
 
 
 
-
+#User Profile
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 Route::post('/update-introduction', [ProfileController::class, 'updateIntroduction'])->name('update.introduction');
+Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+Route::get('/api/profile', [ProfileController::class, 'getProfile']);
+#Route::post('/profile/upload-image', [ProfileController::class, 'uploadProfileImage'])->name('profile.upload.image');
 
+#Chef Dashboard
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chef/dashboard', [ChefDashboardController::class, 'index'])->name('chef.dashboard');
+    Route::get('/chef/dashboard/recipes/create', [ChefDashboardController::class, 'create'])->name('chef.recipes.create');
+    Route::post('/chef/dashboard/recipes', [ChefDashboardController::class, 'store']);
+        // Show the edit form
+    Route::get('/chef/dashboard/recipes/{id}/edit', [ChefDashboardController::class, 'edit'])->name('chef.recipes.edit');
+
+    // Update the recipe
+    Route::put('/chef/dashboard/recipes/{id}/update', [ChefDashboardController::class, 'update']);
+    Route::delete('/chef/dashboard/recipes/{id}', [ChefDashboardController::class, 'destroy'])->name('chef.recipes.destroy');
+    Route::get('/chef/dashboard/recipes/all', [ChefDashboardController::class, 'showAllRecipes'])->name('chef.recipes.showAll');
+
+});
+
+
+
+// Route to update a recipe (using PUT or PATCH)
 
 
 

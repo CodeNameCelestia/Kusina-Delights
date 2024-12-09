@@ -32,7 +32,8 @@
             v-if="userDropdownOpen" 
             class="absolute right-0.5 left-0.5 mt-2 w-45 bg-white border border-gray-200 rounded shadow-lg z-50"
           >
-            <a href="/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
+          
+            <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
             <button 
               @click="logout" 
               class="w-full block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-center"

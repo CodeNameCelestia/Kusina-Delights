@@ -1,97 +1,226 @@
 <template>
-    <Layout>
-      <div class="relative h-[998px] overflow-hidden">
-        <!-- Wrapper for the blurred background with padding to avoid blurred borders -->
-        <div class="absolute inset-0 -m-[20px]">
-          <div
-            class="absolute inset-0 bg-cover bg-center"
-            style="background-image: url('https://c.animaapp.com/9OBfntRB/img/sheelah-brennan-uaevmc51ttw-unsplash-1.png'); filter: brightness(0.3) blur(20px);"
-          ></div>
-        </div>
-  
-        <!-- Main content -->
-        <div class="flex items-center justify-center h-full relative px-12 sm:px-16 lg:px-20">
-          <div class="bg-white w-full max-w-[1600px] p-12 sm:p-16 lg:p-20 rounded-2xl shadow-lg flex gap-12">
-            <!-- Profile Card -->
-            <div
-              class="bg-yellow-300 w-full h-[585px] sm:w-1/3 p-12 rounded-[2rem] shadow-[5px_5px_15px_rgba(0,0,0,0.5)] relative"
-            >
-              <div class="absolute top-6 right-6 text-gray-600 cursor-pointer">
-                <a href="/profile">
-                  <i class="fas fa-pen text-4xl"></i>
-                </a>
-              </div>
-              <div class="flex flex-col items-center">
-                <div
-                  class="w-48 h-48 bg-gray-200 rounded-full flex items-center justify-center shadow-md"
-                >
-                  <i class="fas fa-user text-8xl text-gray-500"></i>
-                </div>
-                <div class="mt-10 border-t-4 border-black w-full"></div>
-                <p class="text-center mt-8 font-semibold text-2xl">Code_Celestia</p>
-                <div class="w-full text-left mt-6 pl-6">
-                  <p class="text-normal font-medium">Email:</p>
-                  <p class="text-normal font-medium">Date Joined:</p>
-                </div>
-              </div>
-              <button
-                class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-green-300 text-black py-2 px-16 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-normal"
-              >
-                Log out
-              </button>
+  <Layout>
+    <div class="relative h-[998px] overflow-hidden">
+      <!-- Wrapper for blurred background -->
+      <div class="absolute inset-0 -m-[20px]">
+        <div
+          class="absolute inset-0 bg-cover bg-center"
+          style="background-image: url('https://c.animaapp.com/9OBfntRB/img/sheelah-brennan-uaevmc51ttw-unsplash-1.png'); filter: brightness(0.3) blur(20px);"
+        ></div>
+      </div>
+
+      <!-- Main content -->
+      <div class="flex items-center justify-center h-full relative px-8 sm:px-12 lg:px-16">
+        <div class="bg-white w-full max-w-[1400px] p-10 sm:p-16 lg:p-20 rounded-2xl shadow-lg flex gap-10 flex-wrap lg:flex-nowrap">
+          <!-- Profile Card -->
+          <div class="bg-yellow-300 flex-1 h-[600px] p-10 rounded-[2rem] shadow-md relative">
+            <div class="absolute top-4 right-4 text-gray-600 cursor-pointer">
+              <a href="/profile">
+                <i class="fas fa-pen text-2xl"></i>
+              </a>
             </div>
-  
-            <!-- Bio and History Section -->
-            <div class="flex flex-col w-full sm:w-2/3 gap-12">
-              <!-- Account Section -->
-              <div
-                class="bg-yellow-300 p-12 h-[585px] rounded-lg shadow-md relative rounded-[2.3rem] shadow-[5px_5px_15px_rgba(0,0,0,0.5)]"
+            <div class="flex flex-col items-center">
+              <!-- Profile Picture -->
+              <div class="relative w-48 h-48 rounded-full shadow-md bg-gray-200 overflow-hidden">
+                <label for="profile_picture" class="cursor-pointer w-full h-full block">
+                  <!-- Profile Image -->
+                  <img
+                    v-if="profileImage"
+                    :src="profileImage"
+                    alt="Profile Picture"
+                    class="w-full h-full object-cover"
+                  />
+                  <!-- Placeholder Icon -->
+                  <i
+                    v-else
+                    class="fas fa-user text-8xl text-gray-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                  ></i>
+                </label>
+                <!-- Hidden File Input -->
+                <input
+                  v-if="editMode"
+                  type="file"
+                  id="profile_picture"
+                  class="hidden"
+                  accept="image/*"
+                  @change="updateProfilePicture"
+                />
+              </div>
+
+              <div class="mt-6 w-full border-t-4 border-black-100"></div>
+              <p class="text-center mt-6 font-semibold text-2xl">{{ profileData.name || 'N/A' }}</p>
+              <div class="w-full text-left mt-4 pl-4">
+                <p class="text-sm font-medium">Email: {{ profileData.email || 'N/A' }}</p>
+                <p class="text-sm font-medium">Date Joined: {{ profileData.date_joined || 'N/A' }}</p>
+              </div>
+            </div>
+            <button
+              class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-green-300 text-black py-2 px-12 rounded-xl font-semibold shadow-md"
+            >
+              Log out
+            </button>
+          </div>
+
+          <!-- Account Section -->
+          <div class="bg-yellow-300 flex-[2] p-8 sm:p-12 rounded-2xl shadow-lg relative">
+            <!-- Edit Icon -->
+            <div class="absolute top-4 right-4 text-gray-600 cursor-pointer">
+              <button
+                class=""
+                @click="toggleEditMode"
               >
-                <div class="absolute top-6 right-6 text-gray-600 cursor-pointer">
-                  <i class="fas fa-pen text-3xl"></i>
+                {{ editMode ? 'Save' : 'Edit' }}
+                <i :class="editMode ? 'fa-solid fa-floppy-disk' : 'fas fa-pen'" class="text-2xl mr-2 transition-all duration-300 text-normal"></i>
+                
+              </button>
+
+
+            </div>
+            <h2 class="font-semibold text-2xl mb-8 text-center text-gray-800">Account</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <!-- Account Fields -->
+              <div v-for="field in accountFields" :key="field.id" class="space-y-4">
+                <label :for="field.id" class="block text-sm font-bold text-gray-700">{{ field.label }}</label>
+                <div class="relative">
+                  <!-- View Mode (Non-Editable) -->
+                  <div v-if="!editMode" class="w-full p-4 rounded-lg text-gray-800 bg-gray-100 border border-gray-300 hover:bg-gray-200 transition-all duration-200 ease-in-out">
+                    <p class="text-sm text-gray-600">{{ field.value || field.placeholder }}</p>
+                  </div>
+                  <!-- Edit Mode (Editable) -->
+                  <input
+                    v-else
+                    :id="field.id"
+                    :type="field.type"
+                    v-model="field.value"
+                    :placeholder="field.placeholder"
+                    class="w-full border border-gray-300 p-3 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out"
+                  />
+                  <!-- Additional input for password confirmation -->
+                  <div v-if="editMode && field.id === 'password'" class="relative mt-4">
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <input
+                      v-model="confirmPassword"
+                      id="confirm_password"
+                      type="password"
+                      placeholder="Confirm Password"
+                      class="w-full border border-gray-300 p-3 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition duration-150 ease-in-out"
+                    />
+                  </div>
                 </div>
-                <h2 class="font-semibold text-large mb-6">Account:</h2>
-  
-                <!-- Username -->
-                <p class="text-lg font-semibold mb-1">Username:</p>
-                <input
-                  type="text"
-                  class="text-small w-4/5 border border-gray-300 p-2 rounded-2xl mb-6 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  placeholder="Enter username"
-                />
-  
-                <!-- Email -->
-                <p class="text-lg font-semibold mb-1">Email:</p>
-                <input
-                  type="email"
-                  class="text-small w-4/5 border border-gray-300 p-2 rounded-2xl mb-6 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  placeholder="Enter email"
-                />
-  
-                <!-- Password -->
-                <p class="text-lg font-semibold mb-1">Password:</p>
-                <input
-                  type="password"
-                  class="text-small w-4/5 border border-gray-300 p-2 rounded-2xl mb-6 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  placeholder="Enter password"
-                />
-  
-                <!-- Confirm Password -->
-                <p class="text-lg font-semibold mb-1">Confirm Password:</p>
-                <input
-                  type="password"
-                  class="text-small w-4/5 border border-gray-300 p-2 rounded-2xl mb-6 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                  placeholder="Confirm password"
-                />
               </div>
             </div>
           </div>
+
+
+
         </div>
       </div>
-    </Layout>
-  </template>
-  
-  <script setup>
-  import Layout from "@/Layouts/frontend.vue";
-  </script>
-  
+    </div>
+  </Layout>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import Layout from "@/Layouts/frontend.vue";
+
+const profileImage = ref(null);
+const editMode = ref(false);
+const accountFields = ref([]);
+const confirmPassword = ref('');
+const profileData = ref({});
+
+// Fetch user profile details
+const fetchProfile = async () => {
+  try {
+    const response = await axios.get('/api/profile');
+    const { user, profile } = response.data;
+
+    profileData.value = {
+      name: user.name,
+      email: user.email,
+      date_joined: user.created_at,
+    };
+
+    accountFields.value = [
+      { id: 'first_name', label: 'First Name', type: 'text', value: profile.first_name, placeholder: 'John' },
+      { id: 'last_name', label: 'Last Name', type: 'text', value: profile.last_name, placeholder: 'Doe' },
+      { id: 'name', label: 'Username', type: 'text', value: user.name, placeholder: 'johndoe123' },
+      { id: 'email', label: 'Email', type: 'email', value: user.email, placeholder: 'john.doe@example.com' },
+      { id: 'password', label: 'Password', type: 'password', value: '', placeholder: '**************' },
+    ];
+
+    profileImage.value = user.ProfileImage ? `/storage/${user.ProfileImage}` : null;
+    console.log(profileImage.value); // Log the image URL
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+  }
+};
+
+// Save profile updates
+const saveProfile = async () => {
+  try {
+    const payload = accountFields.value.reduce((acc, field) => {
+      acc[field.id] = field.value;
+      return acc;
+    }, {});
+
+    payload.password_confirmation = confirmPassword.value;
+
+    await axios.post('/profile/update', payload);
+    alert("Profile updated successfully!");
+    editMode.value = false;
+    fetchProfile();
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    alert("Failed to update profile.");
+  }
+};
+
+// Toggle edit mode
+const toggleEditMode = () => {
+  if (editMode.value) {
+    saveProfile();
+  } else {
+    editMode.value = true;
+  }
+};
+
+// Update Profile Picture (within the same updateProfile function)
+const updateProfilePicture = async (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const formData = new FormData();
+    formData.append('ProfileImage', file);  // Append the image to the form data
+    formData.append('first_name', accountFields.value[0].value);  // Append other form fields
+    formData.append('last_name', accountFields.value[1].value);
+    formData.append('name', accountFields.value[2].value);
+    formData.append('email', accountFields.value[3].value);
+
+    // Send the form data to the profile update route
+    try {
+      const response = await axios.post('/profile/update', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      profileImage.value = `/storage/${response.data.ProfileImage}`; // Update profile image URL
+      alert('Profile updated successfully!');
+      editMode.value = false;
+      fetchProfile();  // Re-fetch the profile data
+    } catch (error) {
+      console.error('Error updating profile image:', error);
+      alert('Failed to update profile image.');
+    }
+  }
+};
+
+
+
+// Initialize data
+onMounted(fetchProfile);
+</script>
+
+<style scoped>
+input::placeholder {
+  color: #aaa;
+}
+</style>

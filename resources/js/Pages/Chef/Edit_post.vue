@@ -10,7 +10,7 @@
 
       <div class="flex items-center justify-center h-full relative px-10 sm:px-12 lg:px-16">
         <div class="bg-white w-full max-w-[200vh] p-12 sm:p-16 lg:p-20 rounded-2xl shadow-lg">
-          <h1 class="text-center text-large font-bold mb-10">Create Recipe</h1>
+          <h1 class="text-center text-large font-bold mb-10">Edit Recipe</h1>
 
           <form class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" @submit.prevent="submitForm">
             <!-- Recipe Title -->
@@ -42,16 +42,6 @@
               ></textarea>
             </div>
 
-            <!-- Video Link -->
-            <div class="col-span-1">
-              <label class="block text-lg font-semibold mb-2">Video Link</label>
-              <input
-                v-model="form.VideoLink"
-                type="url"
-                class="w-full border border-gray-300 shadow-sm rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              />
-            </div>
-
             <!-- Instructions -->
             <div class="col-span-1">
               <label class="block text-lg font-semibold mb-2">Instructions</label>
@@ -61,31 +51,20 @@
               ></textarea>
             </div>
 
-             <!-- Recipe Photo -->
-             <div class="col-span-1">
+            <!-- Recipe Photo -->
+            <div class="col-span-1">
               <label class="block text-lg font-semibold mb-2">Recipe Photo</label>
-              <div
-                class="w-full border border-dashed border-gray-300 rounded-md p-6 text-center text-lg text-gray-500 relative"
-                @dragover.prevent="handleDragOver"
-                @drop.prevent="handleDrop"
-                @click="triggerFileInput"
-                :class="{'bg-gray-100': isFileDragged}"
-              >
-                <input
-                  ref="fileInput"
-                  type="file"
-                  accept="image/*"
-                  class="hidden"
-                  @change="handleFileChange"
-                />
-                <div v-if="imagePreview" class="mb-4">
-                  <img :src="imagePreview" alt="Recipe Preview" class="w-full h-auto max-h-48 object-cover rounded-md" />
-                </div>
-                <span class="text-orange-500 cursor-pointer">Drag & Drop your image here or click to browse</span>
-              </div>
+              <input
+                ref="fileInput"
+                type="file"
+                accept="image/*"
+                @change="handleFileChange"
+                class="w-full text-gray-700"
+              />
+              <img v-if="imagePreview" :src="imagePreview" alt="Preview" class="mt-4 w-full h-40 object-cover" />
             </div>
 
-            <!-- Preparation Time -->
+            <!-- Additional Fields -->
             <div class="col-span-1">
               <label class="block text-lg font-semibold mb-2">Preparation Time (minutes)</label>
               <input
@@ -95,7 +74,6 @@
               />
             </div>
 
-            <!-- Cooking Time -->
             <div class="col-span-1">
               <label class="block text-lg font-semibold mb-2">Cooking Time (minutes)</label>
               <input
@@ -105,21 +83,19 @@
               />
             </div>
 
-            <!-- Difficulty -->
             <div class="col-span-1">
               <label class="block text-lg font-semibold mb-2">Difficulty</label>
               <select
                 v-model="form.Difficulty"
                 class="w-full border border-gray-300 shadow-sm rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
               >
-                <option>Select an option</option>
+                <option disabled value="">Select Difficulty</option>
                 <option>Easy</option>
                 <option>Medium</option>
                 <option>Hard</option>
               </select>
             </div>
 
-            <!-- Servings -->
             <div class="col-span-1">
               <label class="block text-lg font-semibold mb-2">Servings</label>
               <input
@@ -133,19 +109,10 @@
             <div class="col-span-3 flex justify-center mt-6">
               <button
                 type="submit"
-                class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-8 rounded-md shadow-md mr-6"
+                class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-8 rounded-md shadow-md"
               >
-                Create
+                Update
               </button>
-
-              <a href="/dashboard">
-                <button
-                  type="button"
-                  class="bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-8 rounded-md shadow-md"
-                >
-                  Cancel
-                </button>
-              </a>
             </div>
           </form>
         </div>
@@ -155,27 +122,19 @@
 </template>
 
 <script setup>
-import { usePage } from '@inertiajs/inertia'; // Import usePage
-import { ref } from 'vue';
+import Layout from "@/Layouts/frontend.vue";
+import { ref } from "vue";
+import { usePage } from '@inertiajs/vue3';
+import { Inertia } from '@inertiajs/inertia';
 
-// Access CSRF token from the page props
-
-// Form data
-const form = ref({
-  RecipeTitle: '',
-  Description: '',
-  Ingredients: '',
-  VideoLink: '',
-  Instructions: '',
-  RecipePhoto: null,
-  Preparation: null,
-  CookingTime: null,
-  Difficulty: '',
-  Servings: null,
+// Props passed from the controller
+const props = defineProps({
+  recipe: Object,
 });
 
-const imagePreview = ref(null);
-const isFileDragged = ref(false);
+// Initialize the form with recipe data
+const form = ref({ ...props.recipe });
+const imagePreview = ref(props.recipe.RecipePhoto ? `/storage/${props.recipe.RecipePhoto}` : null);
 
 const handleFileChange = (event) => {
   const file = event.target.files[0];
@@ -185,59 +144,32 @@ const handleFileChange = (event) => {
   }
 };
 
-const handleDragOver = () => {
-  isFileDragged.value = true;
-};
-
-const handleDrop = (event) => {
-  const file = event.dataTransfer.files[0];
-  if (file) {
-    form.value.RecipePhoto = file;
-    imagePreview.value = URL.createObjectURL(file);
-  }
-  isFileDragged.value = false;
-};
-
-const triggerFileInput = () => {
-  const input = document.querySelector("input[type='file']");
-  input.click();
-};
-
 const submitForm = async () => {
   try {
+    // Create a FormData object to send the data
     const formData = new FormData();
-    formData.append('RecipeTitle', form.value.RecipeTitle);
-    formData.append('Description', form.value.Description);
-    formData.append('Ingredients', form.value.Ingredients);
-    formData.append('VideoLink', form.value.VideoLink);
-    formData.append('Instructions', form.value.Instructions);
-    formData.append('Preparation', form.value.Preparation);
-    formData.append('CookingTime', form.value.CookingTime);
-    formData.append('Difficulty', form.value.Difficulty);
-    formData.append('Servings', form.value.Servings);
     
-    if (form.value.RecipePhoto) {
-      formData.append('RecipePhoto', form.value.RecipePhoto);
+    // Loop through each form field and append to the FormData object
+    for (const [key, value] of Object.entries(form.value)) {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value);
+      }
     }
 
-    const response = await axios.post('/chef/dashboard/recipes', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    // Send the form data to the backend for updating the recipe
+    await Inertia.put(`/chef/dashboard/recipes/${props.recipe.RecipeID}/update`, formData, {
+      preserveState: true, // Preserve form state after submission
+      onFinish: () => {
+        // Handle after the form submission (optional, for example, show a success message)
       },
     });
-
-    alert(response.data.message);
   } catch (error) {
-    console.error('Error creating recipe:', error);
+    console.error('Error updating recipe:', error);
   }
 };
+
 </script>
 
-
-
 <style scoped>
-/* Optional: Add custom styling for drag and drop feedback */
-.bg-gray-100 {
-  background-color: #f7fafc;
-}
+/* Add your custom styles here */
 </style>

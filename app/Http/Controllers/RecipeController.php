@@ -188,7 +188,7 @@ class RecipeController extends Controller
             ->get();
 
         // Fetch Recent Recipes: Sorted by creation date (most recent first)
-        $recentRecipes = Recipe::latest()->take(3)->get(); // Limit to top 3 most recent
+        $recentRecipes = Recipe::latest()->take(5)->get(); // Limit to top 3 most recent
 
         return Inertia::render('Webpages/Recipes', [
             'famousDelights' => $famousDelights,

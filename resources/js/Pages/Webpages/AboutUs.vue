@@ -23,31 +23,35 @@
           </p>
 
           <div class="flex justify-center gap-20">
-              <div class="w-80 bg-white rounded-lg shadow-lg p-6 text-center">
+              <div class="w-80 bg-white rounded-lg shadow-lg p-6 text-center max-w-screen-xl mb-10 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
                   <!-- Profile Image -->
-                  <img class="w-52 h-52 rounded-2xl mx-auto mb-4" src="https://c.animaapp.com/FBD9Sly2/img/profile-picture-2@2x.png" alt="Profile Image">
+                  <img class="w-52 h-52 rounded-2xl mx-auto mb-4" 
+                  src="/storage/TJ.jpg" 
+                  alt="Profile Image">
                   
                   <!-- Name and Title -->
-                  <h2 class="text-normal font-semibold text-black-100">Alejandro A. Cayasa</h2>
-                  <p class="text-black-100 text-small">Project Designer</p>
+                  <h2 class="text-normal font-semibold text-black-100">Thonjen P. Banguis</h2>
+                  <p class="text-black-100 text-small">Project Leader</p>
                   
                   <!-- Social Media Icons -->
                   <div class="flex justify-center gap-4 mt-4">
-                      <a href="#" class="bg-yellow-100 text-black-100 p-4 rounded-2xl hover:bg-yellow-500 transition">
+                      <a href="https://www.facebook.com/profile.php?id=100009494573792" target="_blank" class="bg-yellow-100 text-black-100 p-4 rounded-2xl hover:bg-yellow-500 transition">
                           <i class="fab fa-facebook-f text-2xl"></i>
                       </a>
-                      <a href="#" class="bg-yellow-100 text-black-100 p-4 rounded-2xl hover:bg-yellow-500 transition">
+                      <a href="https://github.com/Thonjen" target="_blank" class="bg-yellow-100 text-black-100 p-4 rounded-2xl hover:bg-yellow-500 transition">
                           <i class="fab fa-github text-2xl"></i>
                       </a>
-                      <a href="#" class="bg-yellow-100 text-black-100 p-4 rounded-2xl hover:bg-yellow-500 transition">
+                      <a href="#" target="_blank" class="bg-yellow-100 text-black-100 p-4 rounded-2xl hover:bg-yellow-500 transition">
                           <i class="fab fa-linkedin-in text-2xl"></i>
                       </a>
                   </div>
               </div>
 
-              <div class="w-80 bg-white rounded-lg shadow-lg p-6 text-center">
+              <div class="w-80 bg-white rounded-lg shadow-lg p-6 text-center max-w-screen-xl mb-10 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
                   <!-- Profile Image -->
-                  <img class="w-52 h-52 rounded-2xl mx-auto mb-4" src="https://c.animaapp.com/FBD9Sly2/img/profile-picture-2@2x.png" alt="Profile Image">
+                  <img class="w-52 h-52 rounded-2xl mx-auto mb-4" 
+                  src="/storage/Ale.JPG"
+                  alt="Profile Image">
                   
                   <!-- Name and Title -->
                   <h2 class="text-normal font-semibold text-black-100">Alejandro A. Cayasa</h2>
@@ -55,13 +59,13 @@
                   
                   <!-- Social Media Icons -->
                   <div class="flex justify-center gap-4 mt-4">
-                      <a href="#" class="bg-yellow-100 text-black-100 p-4 rounded-xl hover:bg-yellow-500 transition">
+                      <a href="https://www.facebook.com/AlejandroACayasa" target="_blank" class="bg-yellow-100 text-black-100 p-4 rounded-xl hover:bg-yellow-500 transition">
                           <i class="fab fa-facebook-f text-2xl"></i>
                       </a>
-                      <a href="#" class="bg-yellow-100 text-black-100 p-4 rounded-xl hover:bg-yellow-500 transition">
+                      <a href="https://github.com/CodeNameCelestia" target="_blank" class="bg-yellow-100 text-black-100 p-4 rounded-xl hover:bg-yellow-500 transition">
                           <i class="fab fa-github text-2xl"></i>
                       </a>
-                      <a href="#" class="bg-yellow-100 text-black-100 p-4 rounded-xl hover:bg-yellow-500 transition">
+                      <a href="https://www.linkedin.com/in/obsidian-furry-%CA%95-%E1%B4%A5-%CA%94-270066236/" target="_blank" class="bg-yellow-100 text-black-100 p-4 rounded-xl hover:bg-yellow-500 transition">
                           <i class="fab fa-linkedin-in text-2xl"></i>
                       </a>
                   </div>

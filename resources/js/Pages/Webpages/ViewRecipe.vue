@@ -17,25 +17,43 @@
 
         
 
-        <!-- Ingredients and Preparation Section -->
-        <div class="mx-auto text-left max-w-4xl my-4 text-small text-black-100 space-y-4">
+        <!-- Recipe Details Section -->
+        <div class="mx-auto text-left max-w-4xl my-4 text-small text-black-100 space-y-2">
+            <!-- Ingredients -->
             <div>
                 <p class="text-small font-bold">Ingredients</p>
-                <div v-for="(ingredient, index) in recipe.Ingredients.split(',')" :key="index">
-                    <p>{{ ingredient.trim() }}</p>
-                </div>
-            </div>
 
-            <div>
-                <p class="text-normal font-bold">How To Prepare</p>
-                <div v-for="(step, index) in recipe.Instructions.split('\n')" :key="index">
-                    <p><span class="text-small font-bold">{{ step.trim() }}</span></p>
-                </div>
+                <ul class="list-disc pl-5">
+                    <li v-for="(ingredient, index) in recipe.Ingredients.split('\n')" :key="index">
+                        {{ ingredient.trim() }}
+                    </li>
+                </ul>
             </div>
-
+            <br>
+            <!-- Instructions -->
             <div>
-                <p class="font-bold">Additional Information</p>
-                <p>{{ recipe.Description }}</p>
+                <p class="text-small font-bold">How To Prepare</p>
+   
+                <ol class="list-decimal pl-5 space-y-2 text-justify">
+                    <li v-for="(step, index) in recipe.Instructions.split('\n')" :key="index">
+                        {{ step.trim() }}
+                    </li>
+                </ol>
+            </div>
+            <br>
+            <!-- Additional Information -->
+            <div>
+                <p class="font-bold space-y-2">Additional Information:</p>
+                <p><strong>Preparation Time:</strong> {{ recipe.Preparation || 'N/A' }} minutes</p>
+                <p><strong>Cooking Time:</strong> {{ recipe.CookingTime || 'N/A' }} minutes</p>
+                <p><strong>Difficulty:</strong> {{ recipe.Difficulty || 'N/A' }}</p>
+                <p><strong>Servings:</strong> {{ recipe.Servings || 'N/A' }}</p>
+            </div>
+            <br>
+            <!-- Description -->
+            <div>
+                <p class="font-bold">Description</p>
+                <p class="text-justify">{{ recipe.Description }}</p>
             </div>
         </div>
 

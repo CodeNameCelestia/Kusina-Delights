@@ -17,31 +17,67 @@ class ChefDashboardController extends Controller
     {
         $chef = Auth::user()->chef;
         $profile = $chef->user->profile ?? null;
-        
+    
         Log::debug('Profile:', ['profile' => $profile]);
-        
+    
         if (!$profile) {
             return abort(404, 'Profile not found');
         }
+    
+        // Fetch all recipes of the chef (without pagination for views calculation)
+        $recipes = $chef->recipes()->get();
+    
+        // Calculate the total views based on all recipes
+        $totalViews = RecipeView::whereIn('recipe_id', $recipes->pluck('RecipeID'))->count();
         
-        $recipes = $chef->recipes;
-        
-        foreach ($recipes as $recipe) {
+        // Paginate the recipes for display in the dashboard (e.g., 10 per page)
+        $paginatedRecipes = $chef->recipes()->paginate(2);
+    
+        foreach ($paginatedRecipes as $recipe) {
             $recipe->average_rating = $recipe->reviews()->avg('Star');
             $recipe->formatted_date = $recipe->created_at->format('F j, Y');
         }
-        
-        $totalViews = RecipeView::whereIn('recipe_id', $recipes->pluck('RecipeID'))->count();
+    
         $totalIncome = $chef->Income;
-        
+    
         return inertia('Chef/Dashboard', [
             'chef' => $chef,
             'profile' => ['profile' => $profile, 'user' => $chef->user],
-            'recipes' => $recipes,
-            'totalViews' => $totalViews,
+            'recipes' => $paginatedRecipes,  // Paginated recipes
+            'totalViews' => $totalViews,  // Total views from all recipes
             'totalIncome' => $totalIncome,
+            'totalRecipeCount' => $recipes->count(),  // Total number of recipes without pagination
         ]);
     }
+
+    public function showAllRecipes()
+    {
+        $chef = Auth::user()->chef;
+    
+        // Fetch the recipes associated with the chef, paginate them (3 per page)
+        $recipes = $chef->recipes()->paginate(3); // Adjust 3 to whatever number you want per page
+    
+        // Fetch additional data such as average rating, views, and income for each recipe
+        foreach ($recipes as $recipe) {
+            $recipe->average_rating = $recipe->reviews()->avg('Star');
+            $recipe->formatted_date = $recipe->created_at->format('F j, Y');
+            
+            // Calculate views count for each recipe
+            $viewsCount = RecipeView::where('recipe_id', $recipe->RecipeID)->count();
+            $recipe->views_count = $viewsCount;
+    
+            // Calculate income based on views (views * 0.25)
+            $recipe->income = $viewsCount * 0.25;
+        }
+    
+        return inertia('Chef/AllRecipes', [
+            'chef' => $chef,
+            'recipes' => $recipes,  // Pass paginated recipes
+        ]);
+    }
+    
+    
+    
 
     public function create()
     {
@@ -181,23 +217,6 @@ class ChefDashboardController extends Controller
         }
     }
 
-    public function showAllRecipes()
-{
-    $chef = Auth::user()->chef;
-    
-    // Fetch recipes associated with the chef
-    $recipes = $chef->recipes;
-    
-    // Fetch additional data if necessary, such as average rating for each recipe
-    foreach ($recipes as $recipe) {
-        $recipe->average_rating = $recipe->reviews()->avg('Star');
-        $recipe->formatted_date = $recipe->created_at->format('F j, Y');
-    }
 
-    return inertia('Chef/AllRecipes', [
-        'chef' => $chef,
-        'recipes' => $recipes,
-    ]);
-}
-
+    
 }

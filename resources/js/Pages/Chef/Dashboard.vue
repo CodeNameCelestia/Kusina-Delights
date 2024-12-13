@@ -46,7 +46,7 @@
               </div>
               <div class="bg-gray-100 p-8 rounded-xl shadow-lg">
                 <p class="text-normal text-gray-500">Recipes</p>
-                <p class="text-large font-bold">{{ recipes.length }} Recipe(s)</p>
+                <p class="text-large font-bold">{{ totalRecipeCount }} Recipe(s)</p> <!-- Display total recipe count -->
               </div>
               <div class="bg-gray-100 p-8 rounded-xl shadow-lg">
                 <p class="text-normal text-gray-500">Income</p>
@@ -58,8 +58,8 @@
             <div class="w-1/3 bg-yellow-300 p-10 rounded-lg shadow-md rounded-[2.3rem] shadow-[5px_5px_15px_rgba(0,0,0,0.5)]">
               <h2 class="font-semibold text-3xl text-black-100 mb-8 border-b-2 border-black-100 pb-4">History:</h2>
               <ul class="space-y-8">
-                <li v-if="recipes.length === 0" class="text-sm text-black-100">No recipes found.</li>
-                <li v-else v-for="(recipe, index) in recipes" :key="index" class="flex items-start gap-6 transition-transform transform hover:scale-105">
+                <li v-if="recipes.data.length === 0" class="text-sm text-black-100">No recipes found.</li>
+                <li v-else v-for="(recipe, index) in recipes.data" :key="index" class="flex items-start gap-6 transition-transform transform hover:scale-105">
                   <img
                     :src="recipe.RecipePhoto ? `/storage/${recipe.RecipePhoto}` : 'https://via.placeholder.com/403x212'"
                     alt="Recipe Image"
@@ -105,6 +105,25 @@
                   </div>
                 </li>
               </ul>
+
+              <!-- Pagination Controls -->
+              <div v-if="recipes.last_page > 1" class="mt-6">
+                <button
+                  @click="goToPage(recipes.current_page - 1)"
+                  :disabled="recipes.current_page === 1"
+                  class="px-4 py-2 bg-yellow-500 text-black-100 rounded-full disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span class="mx-2">{{ recipes.current_page }} / {{ recipes.last_page }}</span>
+                <button
+                  @click="goToPage(recipes.current_page + 1)"
+                  :disabled="recipes.current_page === recipes.last_page"
+                  class="px-4 py-2 bg-yellow-500 text-black-100 rounded-full disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
             </div>
 
           </div>
@@ -123,7 +142,6 @@
             >
               Create Recipe
             </a>
-
           </div>
         </div>
       </div>
@@ -132,36 +150,82 @@
 </template>
 
 
-<script setup>
-import { ref } from 'vue';
+<script>
 import axios from 'axios';
 import Layout from "@/Layouts/frontend.vue";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
-// Define the props that will be passed from the Laravel controller to the Vue component
-defineProps({
-  chef: Object,
-  profile: Object,
-  recipes: Array,  // Recipes array including details like average_rating, formatted_date
-  totalViews: Number,
-  totalIncome: Number,
-});
+export default {
+  components: {
+    Layout,
+  },
+  props: {
+    chef: Object,
+    profile: Object,
+    recipes: Array,  // Recipes array including details like average_rating, formatted_date
+    totalViews: Number,
+    totalIncome: Number,
+    totalRecipeCount: Number,
+  },
+  methods: {
+    // Pagination method to go to a specific page
+    goToPage(page) {
+      if (page < 1 || page > this.recipes.last_page) return; // Prevent invalid page navigation
 
-// Delete Recipe function
-const deleteRecipe = async (recipeId) => {
-  try {
-    if (confirm('Are you sure you want to delete this recipe?')) {
-      const response = await axios.delete(`/chef/dashboard/recipes/${recipeId}`);
-      if (response.status === 200) {
-        // Remove the recipe from the UI after deletion
-        const index = recipes.findIndex(recipe => recipe.RecipeID === recipeId);
-        if (index !== -1) {
-          recipes.splice(index, 1);
+      this.$inertia.get('/chef/dashboard', { page });
+    },
+
+    // Delete Recipe function with SweetAlert2
+    async deleteRecipe(recipeId) {
+      try {
+        // Show SweetAlert2 confirmation dialog with custom background color
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'No, cancel!',
+          background: 'rgba(255, 255, 255, 1)', // White background for clarity
+          confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+          cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+          iconColor: 'rgba(255, 219, 99, 1)', // Use golden yellow for icon color for consistency
+          customClass: {
+            popup: 'swal-popup', // Add a custom class for further styling if needed
+          },
+        });
+
+
+        if (result.isConfirmed) {
+          // Perform the deletion if confirmed
+          const response = await axios.delete(`/chef/dashboard/recipes/${recipeId}`);
+          if (response.status === 200) {
+            // Show success message with SweetAlert2
+            await Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'The recipe has been deleted successfully.',
+              background: 'rgba(255, 219, 99, 1)', // Custom background color for success
+            });
+
+            // Refresh the page to reflect changes
+            this.$inertia.reload(); // Inertia reload (without full page refresh)
+          }
         }
-        alert('Recipe deleted successfully.');
+      } catch (error) {
+        console.error('Error deleting recipe:', error);
+
+        // Show error message with SweetAlert2
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'There was an issue deleting the recipe. Please try again later.',
+          background: 'rgba(255, 219, 99, 1)', // Custom background color for error
+        });
       }
     }
-  } catch (error) {
-  }
-};
 
+  },
+};
 </script>
+

@@ -126,6 +126,7 @@ import Layout from "@/Layouts/frontend.vue";
 import { ref } from "vue";
 import { usePage } from '@inertiajs/vue3';
 import { Inertia } from '@inertiajs/inertia';
+import Swal from 'sweetalert2';  // Import SweetAlert2
 
 // Props passed from the controller
 const props = defineProps({
@@ -146,29 +147,70 @@ const handleFileChange = (event) => {
 
 const submitForm = async () => {
   try {
-    // Create a FormData object to send the data
-    const formData = new FormData();
-    
-    // Loop through each form field and append to the FormData object
-    for (const [key, value] of Object.entries(form.value)) {
-      if (value !== undefined && value !== null) {
-        formData.append(key, value);
-      }
-    }
-
-    // Send the form data to the backend for updating the recipe
-    await Inertia.put(`/chef/dashboard/recipes/${props.recipe.RecipeID}/update`, formData, {
-      preserveState: true, // Preserve form state after submission
-      onFinish: () => {
-        // Handle after the form submission (optional, for example, show a success message)
+    // Show confirmation dialog before submitting
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to update this recipe?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, update it!',
+      cancelButtonText: 'No, cancel!',
+      background: 'rgba(255, 255, 255, 1)', // White background for clarity
+      confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+      cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+      iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+      customClass: {
+        popup: 'swal-popup', // Add a custom class for further styling if needed
       },
     });
+
+    if (result.isConfirmed) {
+      // Create a FormData object to send the data
+      const formData = new FormData();
+
+      // Loop through each form field and append to the FormData object
+      for (const [key, value] of Object.entries(form.value)) {
+        if (value !== undefined && value !== null) {
+          formData.append(key, value);
+        }
+      }
+
+      // Send the form data to the backend for updating the recipe
+      await Inertia.put(`/chef/dashboard/recipes/${props.recipe.RecipeID}/update`, formData, {
+        preserveState: true, // Preserve form state after submission
+        onFinish: () => {
+          // Handle after the form submission (optional, for example, show a success message)
+          Swal.fire({
+            title: 'Updated!',
+            text: 'Your recipe has been successfully updated.',
+            icon: 'success',
+            confirmButtonText: 'Okay',
+          });
+        },
+      });
+    } else {
+      // If canceled, show a message (optional)
+      Swal.fire({
+        title: 'Cancelled',
+        text: 'Your recipe update has been cancelled.',
+        icon: 'info',
+        confirmButtonText: 'Okay',
+      });
+    }
   } catch (error) {
     console.error('Error updating recipe:', error);
+
+    // Show error alert if something goes wrong
+    Swal.fire({
+      title: 'Error!',
+      text: 'There was an issue updating your recipe. Please try again.',
+      icon: 'error',
+      confirmButtonText: 'Okay',
+    });
   }
 };
-
 </script>
+
 
 <style scoped>
 /* Add your custom styles here */

@@ -54,11 +54,7 @@
                 <p class="text-sm font-medium">Date Joined: {{ profileData.date_joined || 'N/A' }}</p>
               </div>
             </div>
-            <button
-              class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-green-300 text-black py-2 px-12 rounded-xl font-semibold shadow-md"
-            >
-              Log out
-            </button>
+
           </div>
 
           <!-- Account Section -->
@@ -122,6 +118,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import Swal from "sweetalert2";
 import Layout from "@/Layouts/frontend.vue";
 
 const profileImage = ref(null);
@@ -151,9 +148,12 @@ const fetchProfile = async () => {
     ];
 
     profileImage.value = user.ProfileImage ? `/storage/${user.ProfileImage}` : null;
-    console.log(profileImage.value); // Log the image URL
   } catch (error) {
-    console.error("Error fetching profile:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Error fetching profile data!',
+    });
   }
 };
 
@@ -168,12 +168,19 @@ const saveProfile = async () => {
     payload.password_confirmation = confirmPassword.value;
 
     await axios.post('/profile/update', payload);
-    alert("Profile updated successfully!");
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: 'Profile updated successfully.',
+    });
     editMode.value = false;
     fetchProfile();
   } catch (error) {
-    console.error("Error updating profile:", error);
-    alert("Failed to update profile.");
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Failed to update profile.',
+    });
   }
 };
 
@@ -197,27 +204,38 @@ const updateProfilePicture = async (event) => {
     formData.append('name', accountFields.value[2].value);
     formData.append('email', accountFields.value[3].value);
 
-    // Send the form data to the profile update route
     try {
       const response = await axios.post('/profile/update', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       profileImage.value = `/storage/${response.data.ProfileImage}`; // Update profile image URL
-      alert('Profile updated successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Profile picture updated successfully.',
+      });
       editMode.value = false;
       fetchProfile();  // Re-fetch the profile data
     } catch (error) {
-      console.error('Error updating profile image:', error);
-      alert('Failed to update profile image.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to update profile picture.',
+      });
     }
+  } else {
+    Swal.fire({
+      icon: 'warning',
+      title: 'No file selected',
+      text: 'Please select an image to upload.',
+    });
   }
 };
-
-
 
 // Initialize data
 onMounted(fetchProfile);
 </script>
+
 
 <style scoped>
 input::placeholder {

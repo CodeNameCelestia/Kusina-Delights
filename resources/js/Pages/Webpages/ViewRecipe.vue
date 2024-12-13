@@ -227,12 +227,20 @@ export default {
                 // SweetAlert2 confirmation dialog
                 const result = await Swal.fire({
                     title: 'Are you sure?',
-                    text: "This review will be deleted permanently!",
+                    text: "You won't be able to revert this!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, delete it!',
-                    cancelButtonText: 'Cancel',
+                    cancelButtonText: 'No, cancel!',
+                    background: 'rgba(255, 255, 255, 1)', // White background for clarity
+                    confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+                    cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+                    iconColor: 'rgba(255, 219, 99, 1)', // Use golden yellow for icon color for consistency
+                    customClass: {
+                        popup: 'swal-popup', // Add a custom class for further styling if needed
+                    },
                 });
+
 
                 if (result.isConfirmed) {
                     // Make sure the correct review ID is passed in the URL

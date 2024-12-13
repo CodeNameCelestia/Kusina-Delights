@@ -157,6 +157,7 @@
 <script setup>
 import { usePage } from '@inertiajs/inertia'; // Import usePage
 import { ref } from 'vue';
+import Swal from 'sweetalert2';
 
 // Access CSRF token from the page props
 
@@ -205,32 +206,75 @@ const triggerFileInput = () => {
 
 const submitForm = async () => {
   try {
-    const formData = new FormData();
-    formData.append('RecipeTitle', form.value.RecipeTitle);
-    formData.append('Description', form.value.Description);
-    formData.append('Ingredients', form.value.Ingredients);
-    formData.append('VideoLink', form.value.VideoLink);
-    formData.append('Instructions', form.value.Instructions);
-    formData.append('Preparation', form.value.Preparation);
-    formData.append('CookingTime', form.value.CookingTime);
-    formData.append('Difficulty', form.value.Difficulty);
-    formData.append('Servings', form.value.Servings);
-    
-    if (form.value.RecipePhoto) {
-      formData.append('RecipePhoto', form.value.RecipePhoto);
-    }
-
-    const response = await axios.post('/chef/dashboard/recipes', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    // Show confirmation dialog before proceeding
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, submit it!',
+      cancelButtonText: 'No, cancel!',
+      background: 'rgba(255, 255, 255, 1)', // White background for clarity
+      confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+      cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+      iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+      customClass: {
+        popup: 'swal-popup', // Add a custom class for further styling if needed
       },
     });
 
-    alert(response.data.message);
+    // If user clicks "Yes, submit it!", continue with form submission
+    if (result.isConfirmed) {
+      const formData = new FormData();
+      formData.append('RecipeTitle', form.value.RecipeTitle);
+      formData.append('Description', form.value.Description);
+      formData.append('Ingredients', form.value.Ingredients);
+      formData.append('VideoLink', form.value.VideoLink);
+      formData.append('Instructions', form.value.Instructions);
+      formData.append('Preparation', form.value.Preparation);
+      formData.append('CookingTime', form.value.CookingTime);
+      formData.append('Difficulty', form.value.Difficulty);
+      formData.append('Servings', form.value.Servings);
+
+      if (form.value.RecipePhoto) {
+        formData.append('RecipePhoto', form.value.RecipePhoto);
+      }
+
+      const response = await axios.post('/chef/dashboard/recipes', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Show success alert
+      Swal.fire({
+        title: 'Success!',
+        text: response.data.message,
+        icon: 'success',
+        confirmButtonText: 'Okay',
+      });
+    } else {
+      // If canceled, show a message (optional)
+      Swal.fire({
+        title: 'Cancelled',
+        text: 'Your recipe submission has been cancelled.',
+        icon: 'info',
+        confirmButtonText: 'Okay',
+      });
+    }
   } catch (error) {
     console.error('Error creating recipe:', error);
+
+    // Show error alert if something goes wrong
+    Swal.fire({
+      title: 'Error!',
+      text: 'There was an issue creating your recipe. Please try again.',
+      icon: 'error',
+      confirmButtonText: 'Okay',
+    });
   }
 };
+
 </script>
 
 

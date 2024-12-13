@@ -82,9 +82,7 @@
             <!-- Bio and History Section -->
             <div class="flex flex-col w-full sm:w-2/3 gap-12">
               <!-- Bio Section -->
-              <div
-                class="bg-yellow-300 p-10 rounded-lg shadow-md relative rounded-[2.3rem] shadow-[5px_5px_15px_rgba(0,0,0,0.5)]"
-              >
+              <div class="bg-yellow-300 p-10 rounded-lg shadow-md relative rounded-[2.3rem] shadow-[5px_5px_15px_rgba(0,0,0,0.5)]">
                 <div class="absolute top-6 right-6 text-black-100 cursor-pointer" @click="toggleEdit">
                   <i class="fas fa-pen text-3xl"></i>
                 </div>
@@ -100,16 +98,19 @@
                 </div>
                 <div v-else>
                   <p class="text-small italic text-black-100">
-                    <span class="font-semibold "></span> {{ profile.introduction }}
+                    <span class="font-semibold"></span> {{ profile.introduction }}
                   </p>
                 </div>
               </div>
-  
+
               <!-- History Section -->
               <div class="bg-yellow-300 p-10 rounded-lg shadow-md rounded-[2.3rem] shadow-[5px_5px_15px_rgba(0,0,0,0.5)]">
                 <h2 class="font-semibold text-3xl text-black-100 mb-8 border-b-2 border-black-100 pb-4">Review History:</h2>
+                <!-- Review Section (adjusted) -->
                 <ul class="space-y-8">
-                  <li v-if="typeof reviews === 'string'" class="text-sm text-black-100">{{ reviews }}</li>
+                  <li v-if="reviews.length === 0" class="text-sm text-black-100">
+                    No reviews yet.
+                  </li>
                   <li v-else v-for="(review, index) in reviews" :key="index" class="flex items-start gap-6 transition-transform transform hover:scale-105">
                     <!-- Recipe Image -->
                     <img
@@ -153,8 +154,19 @@
                     </div>
                   </li>
                 </ul>
+                <!-- Pagination Controls -->
+                <div v-if="reviews.links && reviews.links.length > 0" class="flex justify-center mt-8 space-x-4">
+                  <button
+                    v-for="(link, index) in reviews.links"
+                    :key="index"
+                    :class="['px-4 py-2 rounded-md', link.active ? 'bg-yellow-400 text-black' : 'bg-white text-black']"
+                    @click="changePage(link.url)"
+                    v-html="link.label"
+                  ></button>
+                </div>
               </div>
             </div>
+
             
           </div>
 
@@ -226,6 +238,7 @@
   import { reactive, ref } from "vue";
   import Layout from "@/Layouts/frontend.vue";
   import { usePage } from "@inertiajs/vue3";
+  import Swal from "sweetalert2"; // Import SweetAlert2
   
   const { props } = usePage();
   const user = reactive(props.user);
@@ -240,67 +253,161 @@
   function toggleEdit() {
     isEditing.value = !isEditing.value;
   }
-  
+
+  function changePage(url) {
+  if (url) {
+    axios
+      .get(url)
+      .then((response) => {
+        if (response.data && response.data.data) {
+          reviews.data = response.data.data; // Update reviews data
+          reviews.links = response.data.links; // Update pagination links
+        } else {
+          console.error("Unexpected response structure:", response);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to fetch data. Please try again later.",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to load the next page.",
+        });
+      });
+  } else {
+    console.warn("Invalid URL passed to changePage method.");
+  }
+}
+
+    
   // Method to save the introduction
   function saveIntroduction() {
+    if (!newIntroduction.value.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Validation Error",
+        text: "Introduction cannot be empty.",
+      });
+      return;
+    }
+  
     isEditing.value = false;
-    // Save to backend
     updateIntroduction(newIntroduction.value);
   }
-  function logout() {
-      this.$inertia.post('/logout');
-  }
+  
   // Method to call the backend API to save the introduction
   function updateIntroduction(introduction) {
-    axios.post('/update-introduction', { introduction })
-      .then(response => {
+    Swal.fire({
+      title: "Saving...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+  
+    axios
+      .post("/update-introduction", { introduction })
+      .then((response) => {
         profile.introduction = introduction;
+        Swal.fire({
+          icon: "success",
+          title: "Saved!",
+          text: "Your introduction has been updated.",
+        });
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to update your introduction. Please try again.",
+        });
       });
   }
-
-
+  
+  function logout() {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, logout",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.$inertia.post("/logout");
+      }
+    });
+  }
+  
   const showModal = ref(false);
-const message = ref('');
-const files = ref([]);
-
-const handleFileUpload = (event) => {
-  files.value = Array.from(event.target.files);
-};
-
-const submitApplication = async () => {
-  try {
+  const message = ref("");
+  const files = ref([]);
+  const isSubmitting = ref(false);
+  
+  const handleFileUpload = (event) => {
+    files.value = Array.from(event.target.files);
+  };
+  
+  const submitApplication = async () => {
+    if (!message.value.trim() || files.value.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Validation Error",
+        text: "Message and at least one file are required.",
+      });
+      return;
+    }
+  
     const formData = new FormData();
-    formData.append('message', message.value);
+    formData.append("message", message.value);
     files.value.forEach((file, index) => {
       formData.append(`files[${index}]`, file);
     });
-
-    isSubmitting.value = true; // Add loading state
-
-    const response = await axios.post('/apply-chef', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-
-    alert(response.data.message);
-    resetModal();
-  } catch (error) {
-    console.error(error);
-    alert('Failed to send application. Please try again.');
-  } finally {
-    isSubmitting.value = false; // Reset loading state
-  }
-};
-
-const resetModal = () => {
-  showModal.value = false;
-  message.value = '';
-  files.value = [];
-};
-
+  
+    try {
+      isSubmitting.value = true;
+  
+      Swal.fire({
+        title: "Submitting...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+  
+      const response = await axios.post("/apply-chef", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+  
+      Swal.fire({
+        icon: "success",
+        title: "Application Sent",
+        text: response.data.message,
+      });
+      resetModal();
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to send application. Please try again.",
+      });
+    } finally {
+      isSubmitting.value = false;
+    }
+  };
+  
+  const resetModal = () => {
+    showModal.value = false;
+    message.value = "";
+    files.value = [];
+  };
   </script>
   

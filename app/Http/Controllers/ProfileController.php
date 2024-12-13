@@ -27,33 +27,37 @@ class ProfileController extends Controller
     public function show()
     {
         $user = Auth::user();
-        $profile = $user->profile; // Assuming a relationship exists: User -> Profile
+        $profile = $user->profile;
+        
+        // Fetch paginated reviews
         $reviews = Review::with('recipe')
             ->where('user_id', $user->id)
-            ->latest()
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->paginate(3);
+        
+        // Map the reviews to the desired structure
+        $formattedReviews = $reviews->map(fn($review) => [
+            'title' => $review->recipe->RecipeTitle,
+            'stars' => $review->Star,
+            'comment' => $review->Review,
+            'RecipePhoto' => $review->recipe->RecipePhoto, // Assuming RecipePhoto stores the path
+            'recipe_id' => $review->recipe_id, // Add the recipe_id for each review
+        ]);
     
         return Inertia::render('Chef/Profile', [
             'user' => [
                 'name' => $user->name,
                 'email' => $user->email,
                 'date_joined' => $user->created_at->format('F j, Y'),
-                'ProfileImage' => $profile->ProfileImage, // Assuming ProfileImage stores the path
+                'ProfileImage' => $profile->ProfileImage,
             ],
             'profile' => [
                 'introduction' => $profile->Introduction ?? 'No introduction set yet',
             ],
-            'reviews' => $reviews->isEmpty()
-                ? 'No reviewed recipe yet.'
-                : $reviews->map(fn($review) => [
-                    'title' => $review->recipe->RecipeTitle,
-                    'stars' => $review->Star,
-                    'comment' => $review->Review,
-                    'RecipePhoto' => $review->recipe->RecipePhoto, // Assuming RecipePhoto stores the path
-                    'recipe_id' => $review->recipe_id, // Add the recipe_id for each review
-                ]),
+            'reviews' => $formattedReviews, // Return the formatted reviews
         ]);
     }
+    
 
     public function edit()
     {

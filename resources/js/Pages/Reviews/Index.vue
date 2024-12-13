@@ -39,19 +39,60 @@
 </template>
 
 <script setup>
-
-import { InertiaLink } from '@inertiajs/inertia-vue3';  // Import InertiaLink for navigation
+import { InertiaLink } from '@inertiajs/inertia-vue3'; // Import InertiaLink for navigation
 import { Inertia } from '@inertiajs/inertia';
 import { defineProps } from 'vue';
 import Layout from '../../Layouts/backend.vue';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const props = defineProps({
   reviews: Object,
 });
 
-const deleteReview = (id) => {
-  if (confirm('Are you sure you want to delete this review?')) {
-    Inertia.delete(route('reviews.destroy', id));
+// Delete review method with SweetAlert2 confirmation
+const deleteReview = async (id) => {
+  // Show SweetAlert2 confirmation before deleting the review
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'You won\'t be able to revert this!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'No, cancel!',
+    background: 'rgba(255, 255, 255, 1)', // White background for clarity
+    confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+    cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+    iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+  });
+
+  if (result.isConfirmed) {
+    try {
+      // Perform the delete action using Inertia's delete method
+      await Inertia.delete(route('reviews.destroy', id));
+      // Show success alert if the review is successfully deleted
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'The review has been deleted.',
+        icon: 'success',
+        confirmButtonText: 'Okay',
+      });
+    } catch (error) {
+      // Show error alert if there is an issue with the deletion
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an issue deleting the review.',
+        icon: 'error',
+        confirmButtonText: 'Try Again',
+      });
+    }
+  } else {
+    // Show cancellation alert if the user cancels the deletion
+    Swal.fire({
+      title: 'Cancelled',
+      text: 'The review was not deleted.',
+      icon: 'info',
+      confirmButtonText: 'Okay',
+    });
   }
 };
 </script>

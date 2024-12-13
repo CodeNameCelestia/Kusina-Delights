@@ -40,9 +40,9 @@
 
 <script setup>
 import Layout from '../../Layouts/backend.vue';
-
 import { defineProps, reactive } from 'vue';
-import { Inertia } from '@inertiajs/inertia';  // Import Inertia for handling the delete request
+import { Inertia } from '@inertiajs/inertia'; // Import Inertia for handling the update request
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const props = defineProps({
   review: Object,
@@ -57,7 +57,50 @@ const form = reactive({
   Review: props.review.Review,
 });
 
-const submit = () => {
-  Inertia.put(route('reviews.update', props.review.ReviewsID), form);
+// Submit review update method
+const submit = async () => {
+  // Show SweetAlert2 confirmation before submitting the review update
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'Are you sure you want to update this review?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, update review!',
+    cancelButtonText: 'No, cancel!',
+    background: 'rgba(255, 255, 255, 1)', // White background for clarity
+    confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+    cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+    iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+  });
+
+  if (result.isConfirmed) {
+    try {
+      // Submit the updated review if confirmed
+      await Inertia.put(route('reviews.update', props.review.ReviewsID), form);
+      // Show success alert if review is successfully updated
+      Swal.fire({
+        title: 'Success!',
+        text: 'Your review has been updated.',
+        icon: 'success',
+        confirmButtonText: 'Okay',
+      });
+    } catch (error) {
+      // Show error alert if there is an issue with the review update
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an error updating your review.',
+        icon: 'error',
+        confirmButtonText: 'Try Again',
+      });
+    }
+  } else {
+    // Show cancellation alert if the user cancels the update
+    Swal.fire({
+      title: 'Cancelled',
+      text: 'Your review was not updated.',
+      icon: 'info',
+      confirmButtonText: 'Okay',
+    });
+  }
 };
 </script>

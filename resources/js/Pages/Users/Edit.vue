@@ -85,6 +85,7 @@ import Layout from '../../Layouts/backend.vue';
 import { watch } from 'vue';
 import { ref, onMounted } from 'vue';
 import { useForm } from '@inertiajs/inertia-vue3';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const props = defineProps({
   user: Object,
@@ -128,10 +129,8 @@ const handleImageChange = (event) => {
   }
 };
 
-
-
-
 const submitForm = async () => {
+  try {
     const formData = new FormData();
 
     // Append user data
@@ -149,34 +148,88 @@ const submitForm = async () => {
 
     // Append profile image only if a new file is selected
     if (form.profile.profile_image instanceof File) {
-        formData.append('profile[profile_image]', form.profile.profile_image);
+      formData.append('profile[profile_image]', form.profile.profile_image);
     }
 
     // Append chef data if applicable
     if (form.role === 'chef' && form.chef.income) {
-        formData.append('chef[income]', form.chef.income);
+      formData.append('chef[income]', form.chef.income);
     }
 
-    try {
-        await form.put(route('users.update', props.user.id), {
-            onSuccess: () => alert('User updated successfully!'),
-            onError: () => alert('Error updating user.'),
-        });
-    } catch (error) {
-        console.error('Error submitting form:', error);
+    // SweetAlert2 for confirmation before form submission
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to update this user\'s information?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, update it!',
+      cancelButtonText: 'No, cancel!',
+      background: 'rgba(255, 255, 255, 1)', // White background for clarity
+      confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+      cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+      iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+    });
+
+    if (result.isConfirmed) {
+      await form.put(route('users.update', props.user.id), {
+        data: formData,
+        onSuccess: () => {
+          Swal.fire({
+            title: 'Success!',
+            text: 'User updated successfully.',
+            icon: 'success',
+            confirmButtonText: 'Okay',
+          });
+        },
+        onError: () => {
+          Swal.fire({
+            title: 'Error!',
+            text: 'There was an error updating the user.',
+            icon: 'error',
+            confirmButtonText: 'Try Again',
+          });
+        }
+      });
+    } else {
+      Swal.fire({
+        title: 'Cancelled',
+        text: 'No changes were made.',
+        icon: 'info',
+        confirmButtonText: 'Okay',
+      });
     }
+  } catch (error) {
+    console.error('Error submitting form:', error);
+
+    // Show error alert if something goes wrong
+    Swal.fire({
+      title: 'Error!',
+      text: 'There was an issue with your submission. Please try again.',
+      icon: 'error',
+      confirmButtonText: 'Okay',
+    });
+  }
 };
-
-
 
 watch(
   () => form.role,
-  (newRole, oldRole) => {
+  async (newRole, oldRole) => {
     if (oldRole === 'chef' && (newRole === 'admin' || newRole === 'user')) {
-      const confirmed = confirm(
-        `Changing the role from Chef to ${newRole} will delete all chef-related data for this user. Do you want to proceed?`
-      );
-      if (!confirmed) {
+      // SweetAlert2 confirmation for role change
+      const confirmed = await Swal.fire({
+        title: `Changing role from Chef to ${newRole}`,
+        text: `This will delete all chef-related data for this user. Do you want to proceed?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, proceed!',
+        cancelButtonText: 'No, go back!',
+        background: 'rgba(255, 255, 255, 1)', // White background for clarity
+        confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+        cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button
+        iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color
+      });
+
+      if (!confirmed.isConfirmed) {
         form.role = oldRole; // Revert role if not confirmed
       }
     }

@@ -93,10 +93,9 @@
 
 <script setup>
 import Layout from '../../Layouts/backend.vue';
-
 import { ref, onMounted } from 'vue';
 import { useForm } from '@inertiajs/inertia-vue3';
-
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const props = defineProps({
   recipe: Object,
@@ -133,14 +132,53 @@ const handleFileUpload = (event) => {
   }
 };
 
-const submitForm = () => {
-  form.put(route('recipes.update', props.recipe.RecipeID), {
-    onFinish: () => errors.value = [],  // Reset errors on submit success
-    onError: (error) => errors.value = error,  // Show errors if the form fails
+const submitForm = async () => {
+  // Show confirmation alert before submitting
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'You are about to update this recipe.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, update it!',
+    cancelButtonText: 'No, cancel',
+    background: 'rgba(255, 255, 255, 1)', // White background for clarity
+    confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+    cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+    iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
   });
+
+  if (result.isConfirmed) {
+    // Proceed with form submission if confirmed
+    form.put(route('recipes.update', props.recipe.RecipeID), {
+      onFinish: () => {
+        // Show success alert if the update is successful
+        Swal.fire({
+          title: 'Updated!',
+          text: 'Your recipe has been updated successfully.',
+          icon: 'success',
+          confirmButtonText: 'Great!',
+        });
+        errors.value = [];  // Reset errors
+      },
+      onError: (error) => {
+        // Show error alert if the form fails
+        Swal.fire({
+          title: 'Error!',
+          text: 'There was an error updating the recipe.',
+          icon: 'error',
+          confirmButtonText: 'Try Again',
+        });
+        errors.value = error;  // Show errors
+      },
+    });
+  } else {
+    // Show cancellation alert if the user cancels
+    Swal.fire({
+      title: 'Cancelled',
+      text: 'Recipe update has been cancelled.',
+      icon: 'info',
+      confirmButtonText: 'Okay',
+    });
+  }
 };
 </script>
-
-<style scoped>
-/* Optional styling for better appearance */
-</style>

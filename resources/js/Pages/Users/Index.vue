@@ -62,14 +62,44 @@ import { defineProps } from 'vue';
 import { InertiaLink } from '@inertiajs/inertia-vue3';
 import { Inertia } from '@inertiajs/inertia';
 import Layout from '../../Layouts/backend.vue';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const props = defineProps({
   users: Array,
 });
 
-const submitDelete = (userId) => {
-  if (confirm("Are you sure you want to delete this user?")) {
+const submitDelete = async (userId) => {
+  // SweetAlert2 confirmation dialog
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'You won\'t be able to revert this!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'No, cancel!',
+    background: 'rgba(255, 255, 255, 1)', // White background for clarity
+    confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+    cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+    iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+  });
+
+  // If confirmed, proceed with the deletion
+  if (result.isConfirmed) {
     Inertia.delete(`/users/${userId}`);
+    Swal.fire({
+      title: 'Deleted!',
+      text: 'User has been deleted.',
+      icon: 'success',
+      confirmButtonText: 'Okay',
+    });
+  } else {
+    Swal.fire({
+      title: 'Cancelled',
+      text: 'User deletion was cancelled.',
+      icon: 'info',
+      confirmButtonText: 'Okay',
+    });
   }
 };
 </script>
+

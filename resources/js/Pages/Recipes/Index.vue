@@ -49,6 +49,7 @@
 import Layout from '../../Layouts/backend.vue';
 import { Inertia } from '@inertiajs/inertia';  // Import Inertia for handling the delete request
 import { InertiaLink } from '@inertiajs/inertia-vue3';  // Import InertiaLink for navigation
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 // Define props for the component
 defineProps({
@@ -57,13 +58,52 @@ defineProps({
 
 // Delete method to handle recipe deletion
 const deleteRecipe = async (recipeId) => {
-  // Confirm deletion
-  if (confirm('Are you sure you want to delete this recipe?')) {
-    // Perform the delete action using Inertia's delete method
-    await Inertia.delete(route('recipes.destroy', recipeId));
+  // Show confirmation alert using SweetAlert2
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will not be able to recover this recipe!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'No, cancel!',
+    background: 'rgba(255, 255, 255, 1)', // White background for clarity
+    confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+    cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+    iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+  });
+
+  if (result.isConfirmed) {
+    try {
+      // Perform the delete action using Inertia's delete method
+      await Inertia.delete(route('recipes.destroy', recipeId));
+      // Show success alert if recipe is deleted successfully
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'The recipe has been deleted.',
+        icon: 'success',
+        confirmButtonText: 'Okay',
+      });
+    } catch (error) {
+      // Show error alert if there is an issue with the delete action
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an error deleting the recipe.',
+        icon: 'error',
+        confirmButtonText: 'Try Again',
+      });
+    }
+  } else {
+    // Show cancellation alert if the user cancels
+    Swal.fire({
+      title: 'Cancelled',
+      text: 'The recipe was not deleted.',
+      icon: 'info',
+      confirmButtonText: 'Okay',
+    });
   }
 };
 </script>
+
 
 <style scoped>
 /* Optional custom styles can be added here */

@@ -89,6 +89,7 @@
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/inertia-vue3';
 import Layout from '../../Layouts/backend.vue';
+import Swal from 'sweetalert2';  // Import SweetAlert2
 
 const form = useForm({
   name: '',
@@ -120,7 +121,58 @@ const buildFormData = () => {
   return formData;
 };
 
-const submitForm = () => {
-  form.post(route('users.store'), { data: buildFormData() });
+const submitForm = async () => {
+  try {
+    // Show confirmation dialog before submitting
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to submit this form?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, submit it!',
+      cancelButtonText: 'No, cancel!',
+      background: 'rgba(255, 255, 255, 1)', // White background for clarity
+      confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+      cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+      iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+      customClass: {
+        popup: 'swal-popup', // Add a custom class for further styling if needed
+      },
+    });
+
+    if (result.isConfirmed) {
+      // If user confirms, submit the form
+      form.post(route('users.store'), {
+        data: buildFormData(),
+        onFinish: () => {
+          // Success alert after successful form submission
+          Swal.fire({
+            title: 'Success!',
+            text: 'The form has been successfully submitted.',
+            icon: 'success',
+            confirmButtonText: 'Okay',
+          });
+        },
+      });
+    } else {
+      // If canceled, show a cancellation alert
+      Swal.fire({
+        title: 'Cancelled',
+        text: 'Your form submission has been cancelled.',
+        icon: 'info',
+        confirmButtonText: 'Okay',
+      });
+    }
+  } catch (error) {
+    console.error('Error submitting form:', error);
+
+    // Show error alert if something goes wrong
+    Swal.fire({
+      title: 'Error!',
+      text: 'There was an issue with your submission. Please try again.',
+      icon: 'error',
+      confirmButtonText: 'Okay',
+    });
+  }
 };
 </script>

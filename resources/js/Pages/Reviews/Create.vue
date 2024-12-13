@@ -41,9 +41,9 @@
 <script setup>
 import { reactive } from 'vue';
 import { Inertia } from '@inertiajs/inertia';
-
 import Layout from '../../Layouts/backend.vue';
 import { defineProps } from 'vue';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const props = defineProps({
   users: Array,
@@ -57,7 +57,50 @@ const form = reactive({
   Review: '',
 });
 
-const submit = () => {
-  Inertia.post(route('reviews.store'), form);
+// Submit review method
+const submit = async () => {
+  // Show SweetAlert2 confirmation before submitting the review
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'Once submitted, you will not be able to change your review!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, submit review!',
+    cancelButtonText: 'No, cancel!',
+    background: 'rgba(255, 255, 255, 1)', // White background for clarity
+    confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+    cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+    iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+  });
+
+  if (result.isConfirmed) {
+    try {
+      // Submit the review form if confirmed
+      await Inertia.post(route('reviews.store'), form);
+      // Show success alert if review is successfully submitted
+      Swal.fire({
+        title: 'Success!',
+        text: 'Your review has been submitted.',
+        icon: 'success',
+        confirmButtonText: 'Okay',
+      });
+    } catch (error) {
+      // Show error alert if there is an issue with the form submission
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an error submitting your review.',
+        icon: 'error',
+        confirmButtonText: 'Try Again',
+      });
+    }
+  } else {
+    // Show cancellation alert if the user cancels submission
+    Swal.fire({
+      title: 'Cancelled',
+      text: 'Your review was not submitted.',
+      icon: 'info',
+      confirmButtonText: 'Okay',
+    });
+  }
 };
 </script>

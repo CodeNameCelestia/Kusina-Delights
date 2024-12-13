@@ -85,6 +85,7 @@
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import Layout from '../../Layouts/backend.vue';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const props = defineProps({
   chefs: Array,
@@ -108,11 +109,43 @@ const handleFileChange = (event) => {
 };
 
 const submitForm = async () => {
-  await form.post(route('recipes.store'), {
-    preserveState: true,
-    onFinish: () => {
-      Inertia.visit(route('recipes.index'));
-    },
+  // Show SweetAlert2 confirmation dialog before form submission
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'You are about to submit this recipe.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, submit it!',
+    cancelButtonText: 'No, cancel',
+    background: 'rgba(255, 255, 255, 1)', // White background for clarity
+    confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+    cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+    iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
   });
+
+  // If confirmed, submit the form
+  if (result.isConfirmed) {
+    await form.post(route('recipes.store'), {
+      preserveState: true,
+      onFinish: () => {
+        Inertia.visit(route('recipes.index'));
+        // Show success alert after successful form submission
+        Swal.fire({
+          title: 'Submitted!',
+          text: 'Your recipe has been submitted.',
+          icon: 'success',
+          confirmButtonText: 'Great!',
+        });
+      },
+    });
+  } else {
+    // Show cancellation alert if the user cancels
+    Swal.fire({
+      title: 'Cancelled',
+      text: 'Recipe submission has been cancelled.',
+      icon: 'info',
+      confirmButtonText: 'Okay',
+    });
+  }
 };
 </script>

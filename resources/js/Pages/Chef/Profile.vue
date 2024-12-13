@@ -41,20 +41,35 @@
 
               <!-- Buttons Container -->
               <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col space-y-4">
+                
+                <!--Chef-->
+                <button
+                    @click="showModal = true"
+                    class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
+                  >
+                    Apply to be a Chef
+                </button>
+
+                <!--Admin
                 <a
                   href="/dashboard"
                   class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
                 >
                   Admin Dasboard
                 </a>
+                -->
 
+
+                
+                <!--Chef Dashboard-->
+                
                 <a
                   href="/chef/dashboard"
                   class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
                 >
                   Chef Dasboard
                 </a>
-
+                <!--Logout-->
                 <button
                   @click="logout"
                   class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
@@ -140,7 +155,68 @@
                 </ul>
               </div>
             </div>
+            
           </div>
+
+          <!-- Modal -->
+          <div
+            v-if="showModal"
+            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          >
+            <div
+              class="bg-white w-full max-w-lg p-6 rounded-lg shadow-lg relative"
+            >
+              <h2 class="text-xl font-semibold mb-4">Apply to be a Chef</h2>
+
+              <!-- Form -->
+              <form @submit.prevent="submitApplication">
+                <div class="mb-4">
+                  <label for="message" class="block text-gray-700 font-medium mb-2">Message:</label>
+                  <textarea
+                    id="message"
+                    v-model="message"
+                    class="w-full border rounded-md p-2"
+                    placeholder="Write your application message here..."
+                    rows="4"
+                    required
+                  ></textarea>
+                </div>
+
+                <div class="mb-4">
+                  <label for="files" class="block text-gray-700 font-medium mb-2">Upload Files:</label>
+                  <input
+                    id="files"
+                    type="file"
+                    @change="handleFileUpload"
+                    multiple
+                    class="w-full border rounded-md p-2"
+                  />
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex justify-end gap-4">
+                  <button
+                    type="button"
+                    @click="showModal = false"
+                    class="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div v-if="isSubmitting" class="flex items-center justify-center">
+            <div class="spinner">Loading...</div>
+          </div>
+
         </div>
       </div>
     </Layout>
@@ -184,5 +260,47 @@
         console.error(error);
       });
   }
+
+
+  const showModal = ref(false);
+const message = ref('');
+const files = ref([]);
+
+const handleFileUpload = (event) => {
+  files.value = Array.from(event.target.files);
+};
+
+const submitApplication = async () => {
+  try {
+    const formData = new FormData();
+    formData.append('message', message.value);
+    files.value.forEach((file, index) => {
+      formData.append(`files[${index}]`, file);
+    });
+
+    isSubmitting.value = true; // Add loading state
+
+    const response = await axios.post('/apply-chef', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    alert(response.data.message);
+    resetModal();
+  } catch (error) {
+    console.error(error);
+    alert('Failed to send application. Please try again.');
+  } finally {
+    isSubmitting.value = false; // Reset loading state
+  }
+};
+
+const resetModal = () => {
+  showModal.value = false;
+  message.value = '';
+  files.value = [];
+};
+
   </script>
   

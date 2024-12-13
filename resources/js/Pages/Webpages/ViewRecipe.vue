@@ -61,51 +61,78 @@
         <div class="p-6 bg-gray-100 rounded-lg max-w-6xl mx-auto space-y-4 mt-8">
             <h2 class="text-2xl font-bold">Reviews</h2>
 
-            <!-- Check if there are no reviews -->
-            <div v-if="recipe.reviews.length === 0" class="bg-white p-4 text-center text-gray-600 font-semibold">
-                No reviews yet.
+            <!-- Overlay for Non-Logged-In Users -->
+            <div v-if="!user" class=" inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center">
+                <p class="text-white text-center text-lg font-bold">
+                    Log in to view or write a review.
+                </p>
             </div>
 
-            <!-- Individual reviews will be dynamically added here -->
-            <div v-else class="bg-gray-200 rounded-lg p-4 space-y-4">
-                <div v-for="(review, index) in recipe.reviews" :key="index" class="bg-white rounded-lg p-4 flex justify-between items-start shadow-sm">
-                    <div>
-                        <p class="flex items-center text-gray-700 font-bold">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="text-gray-500">
-                                <circle cx="12" cy="8" r="4" class="fill-current text-gray-600" />
-                                <path d="M12 14c-4 0-6 2-6 3v1h12v-1c0-1-2-3-6-3z" class="fill-current text-gray-600" />
-                            </svg>
-                            {{ review.user.name || 'Anonymous' }}
-                        </p>
-                        <p class="text-gray-600 mt-1"><i>{{ review.Review }}</i></p>
-                    </div>
-                    <div class="flex items-center">
-                        <!-- Stylish Star SVG icons with hover effect -->
-                        <svg v-for="star in 5" :key="star" :class="{
-                            'fill-yellow-500': review.Star >= star,
-                            'fill-gray-300': review.Star < star,
-                            'cursor-pointer': true,
-                            'hover:fill-yellow-400': true,
-                            'transition-colors': true
-                        }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                            <path :d="review.Star >= star ? 
-                            'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z' : 
-                            'M12 15.4l3.76 2.28-1-4.17 3.27-2.84-4.28-.38L12 4.75l-1.75 5.68-4.28.38 3.27 2.84-1 4.17z'" />
-                        </svg>
+            <!-- Reviews Section -->
+            <div v-else>
+                <!-- No reviews -->
+                <div v-if="recipe.reviews.length === 0" class="bg-white p-4 text-center text-gray-600 font-semibold">
+                    No reviews yet.
+                </div>
+
+                <!-- Individual Reviews -->
+                <div v-else class="bg-gray-200 rounded-lg p-4 space-y-4">
+                    <div v-for="(review, index) in recipe.reviews" :key="index" class="bg-white rounded-lg p-4 flex justify-between items-start shadow-sm">
+                        <div>
+                            <p class="flex items-center text-gray-700 font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="text-gray-500">
+                                    <circle cx="12" cy="8" r="4" class="fill-current text-gray-600" />
+                                    <path d="M12 14c-4 0-6 2-6 3v1h12v-1c0-1-2-3-6-3z" class="fill-current text-gray-600" />
+                                </svg>
+                                {{ review.user.name || 'Anonymous' }}
+                            </p>
+                            <p class="text-gray-600 mt-1"><i>{{ review.Review }}</i></p>
+                        </div>
+                        <div class="flex flex-col items-center space-y-2">
+                            <!-- Stylish Star SVG icons with hover effect -->
+                            <div class="flex items-center space-x-1">
+                                <svg v-for="star in 5" :key="star" :class="{
+                                    'fill-yellow-500': review.Star >= star,
+                                    'fill-gray-300': review.Star < star,
+                                    'cursor-pointer': true,
+                                    'hover:fill-yellow-400': true,
+                                    'transition-colors': true
+                                }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                                    <path :d="review.Star >= star ? 
+                                    'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z' : 
+                                    'M12 15.4l3.76 2.28-1-4.17 3.27-2.84-4.28-.38L12 4.75l-1.75 5.68-4.28.38 3.27 2.84-1 4.17z'" />
+                                </svg>
+                            </div>
+                            
+                            <!-- Delete Review Button -->
+                            <div class="flex justify-center">
+                                <button
+                                    v-if="review.user.id === user.id"
+                                    @click="deleteReview(review.ReviewsID)" 
+                                    class="bg-red-400 text-white font-semibold py-1 px-3 rounded-lg hover:bg-red-500 text-sm"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-            </div>
 
-            <!-- Add Review Section -->
-            <h3 class="text-xl font-bold mt-6">Write a Review</h3>
-            <div class="bg-gray-200 rounded-lg p-4 space-y-3">
-                <textarea v-model="reviewText" placeholder="Review*" class="w-full p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 resize-none text-small"></textarea>
+                </div>
 
-                <div class="flex items-center space-x-4">
-                    <input type="text" v-model="username" placeholder="Username*" class="w-1/2 p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 text-small" />
-                    <div class="flex items-center space-x-2">
-                        <label class="text-gray-700 font-semibold">Rate</label>
+                <!-- Add Review Section -->
+                <div
+                    v-if="!userHasReviewed"
+                    class="bg-gray-200 rounded-lg p-4 space-y-3"
+                >
+                    <textarea
+                        v-model="reviewText"
+                        placeholder="Review*"
+                        class="w-full p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 resize-none text-small"
+                    ></textarea>
                         <div class="flex items-center space-x-1 text-2xl">
+                            <p>Rate:</p>
                             <svg v-for="star in 5" :key="star" @click="setRating(star)" :class="{
                                 'fill-yellow-500': rating >= star,
                                 'fill-gray-300': rating < star,
@@ -118,68 +145,113 @@
                                 'M12 15.4l3.76 2.28-1-4.17 3.27-2.84-4.28-.38L12 4.75l-1.75 5.68-4.28.38 3.27 2.84-1 4.17z'" />
                             </svg>
                         </div>
+                    <div class="flex justify-start space-x-2 mt-4">
+                        <button
+                            @click="submitReview"
+                            class="bg-green-400 text-white font-semibold py-2 px-36 rounded-2xl hover:bg-green-500 text-small"
+                        >
+                            Submit Review
+                        </button>
                     </div>
-                </div>
-
-                <div class="flex justify-start space-x-2 mt-4">
-                    <button @click="submitReview" class="bg-green-400 text-white font-semibold py-2 px-36 rounded-2xl hover:bg-green-500 text-small">Submit Review</button>
-                    <button class="bg-red-400 text-white font-semibold py-2 px-28 rounded-2xl hover:bg-red-500 text-small">Cancel</button>
                 </div>
             </div>
 
-        </div>
+
+
     </Layout>
 </template>
 
 
 <script>
 import Layout from '../../Layouts/frontend.vue';
+import axios from 'axios';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 export default {
-    components: {
-        Layout,
-    },
+    components: { Layout },
     props: {
-        recipe: Object, // Received from the controller
-        viewCount: Number, 
+        recipe: Object,
+        viewCount: Number,
+        user: Object, // Pass authenticated user from the controller
     },
     data() {
         return {
             rating: 0,
-            reviewText: '', // Store the review text
-            username: '', // Store the username if necessary (not used in backend for this case)
+            reviewText: '',
+            userHasReviewed: false, // Check if the user has already reviewed
         };
     },
     mounted() {
-        // Debugging: Check if view_count is received properly
-        console.log("Received view count:", this.viewCount);
+        this.userHasReviewed = this.recipe.reviews.some(
+            (review) => review.user.id === this.user?.id
+        );
     },
     methods: {
         setRating(star) {
             this.rating = star;
         },
         async submitReview() {
+            if (!this.user) {
+                alert("You must be logged in to submit a review.");
+                return;
+            }
+
             try {
-                // Make the POST request to store the review
                 const response = await axios.post(`/api/recipes/${this.recipe.RecipeID}/reviews`, {
-                    rating: this.rating,
                     review: this.reviewText,
+                    star: this.rating,
+                    user_id: this.user.id, // Make sure to send the user.id here
                 });
 
-                // Optionally, you can update the reviews list or show a success message here
-                this.recipe.reviews.push(response.data); // Add the new review to the recipe's reviews
-                this.reviewText = ''; // Reset review text
-                this.rating = 0; // Reset rating
+                this.recipe.reviews.push(response.data);
+                this.reviewText = '';
+                this.rating = 0;
+                this.userHasReviewed = true;
+
+                // Reload the page to reflect the new review
+                location.reload(); // This will refresh the page
             } catch (error) {
                 console.error('Error submitting review:', error);
             }
         },
+
+
+        // Updated delete method with SweetAlert
+        async deleteReview(reviewId) {
+            if (!reviewId) {
+                console.error("Review ID is undefined.");
+                return;
+            }
+
+            try {
+                // SweetAlert2 confirmation dialog
+                const result = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This review will be deleted permanently!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                });
+
+                if (result.isConfirmed) {
+                    // Make sure the correct review ID is passed in the URL
+                    const response = await axios.delete(`/api/recipes/${this.recipe.RecipeID}/reviews/${reviewId}`);
+                    // Remove the deleted review from the local reviews array
+                    this.recipe.reviews = this.recipe.reviews.filter((review) => review.ReviewsID !== reviewId);
+                    // Reload the page to reflect changes
+                    location.reload(); // This will refresh the page
+                }
+            } catch (error) {
+                console.error('Error deleting review:', error);
+            }
+        }
     },
 };
-
-
 </script>
 
 <style scoped>
 /* Optional styling adjustments */
 </style>
+
+

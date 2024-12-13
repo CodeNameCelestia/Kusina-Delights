@@ -7,7 +7,8 @@ use App\Models\RecipeView;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;  // Import the Log facade
+use Illuminate\Support\Facades\Log;  
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;  
 
 use Inertia\Inertia;
 
@@ -15,32 +16,18 @@ class RecipeViewerController extends Controller
 {
     public function show($id)
     {
-        // Fetch the recipe along with its reviews and users
-        $recipe = Recipe::with('reviews.user')->findOrFail($id);
-    
-        // Track views
-        $sessionId = Session::getId(); // Get the current session ID
-        $viewExists = RecipeView::where('recipe_id', $id)
-            ->where('session_id', $sessionId)
-            ->exists();
-    
-        if (!$viewExists) {
-            RecipeView::create([
-                'recipe_id' => $id,
-                'session_id' => $sessionId,
-            ]);
-        }
-    
-        // Get the total view count for the recipe
+        $recipe = Recipe::with('reviews.user', 'chef')->findOrFail($id);
         $viewCount = RecipeView::where('recipe_id', $id)->count();
-        Log::info("View count for recipe {$id}: " . $viewCount);
-
-        // Return the view
+        $user = Auth::user(); // Get the authenticated user
+    
         return Inertia::render('Webpages/ViewRecipe', [
             'recipe' => $recipe,
-            'viewCount' => $viewCount, // Pass the view count to the frontend
+            'viewCount' => $viewCount,
+            'user' => $user, // Pass the user to the frontend
         ]);
     }
+    
+    
     
    
 
@@ -50,30 +37,53 @@ class RecipeViewerController extends Controller
         return response()->json($reviews);
     }
 
-    public function storeReview(Request $request, $id)
+    public function storeReview(Request $request, $recipeId)
     {
         $validated = $request->validate([
-            'review' => 'nullable|string',
-            'rating' => 'required|integer|min:1|max:5', // Rating is required and should be between 1 and 5
+            'review' => 'required|string|max:1000',
+            'star' => 'required|integer|min:1|max:5', // Ensure the star rating is between 1 and 5
         ]);
     
-        // Ensure the user is authenticated and get the current user ID
-        $user = Auth::user();
+        // Debugging: Check if 'star' is available and valid
+        Log::debug('Star value:', ['star' => $validated['star']]);
     
-        // Check if the user has already reviewed this recipe
-        if (Review::where('user_id', $user->id)->where('recipe_id', $id)->exists()) {
-            return redirect()->back()->withErrors('You have already reviewed this recipe.');
+        // Create the review with the validated data
+        $review = new Review();
+        $review->recipe_id = $recipeId;
+        $review->user_id = Auth::id();
+        $review->review = $validated['review'];
+        $review->star = $validated['star']; // Ensure the rating is saved
+        $review->save();
+    
+        return response()->json($review, 201); // Respond with the created review
+    }
+    
+    
+    
+    public function destroy($recipeId, $reviewId)
+    {
+        // Manually check if the review belongs to the current user
+        $review = Review::where('ReviewsID', $reviewId)
+                        ->where('recipe_id', $recipeId)
+                        ->first();
+    
+        if (!$review) {
+            return response()->json(['message' => 'Review not found'], 404);
         }
     
-        // Create review
-        $review = Review::create([
-            'user_id' => $user->id,
-            'recipe_id' => $id,
-            'Star' => $validated['rating'],
-            'Review' => $validated['review'] ?? null, // Review can be nullable
-        ]);
+        // Check if the authenticated user is the owner of the review
+        if ($review->user_id !== Auth::id()) {
+            return response()->json(['message' => 'You are not authorized to delete this review'], 403);
+        }
     
-        // Return the new review data as JSON for front-end updates
-        return response()->json($review, 201);
+        // Delete the review
+        $review->delete();
+    
+        return response()->json(['message' => 'Review deleted successfully']);
     }
+    
+    
+    
+    
+
 }

@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\RecipeViewerController;
 use App\Http\Controllers\ChefDashboardController;
-
+use App\Http\Controllers\ChefApplicationController;
 use App\Http\Controllers\ReviewController;
 use App\Models\Recipe;
 use Illuminate\Support\Facades\Auth;
@@ -69,7 +69,7 @@ Route::get('api/recipes/{id}', [RecipeViewerController::class, 'show']);
 Route::get('api/recipes/{id}/reviews', [RecipeViewerController::class, 'getReviews']);
 Route::post('api/recipes/{id}/reviews', [RecipeViewerController::class, 'storeReview']);
 Route::get('api/recipes', [RecipeController::class, 'search']);
-
+Route::delete('api/recipes/{recipe}/reviews/{reviewId}', [RecipeViewerController::class, 'destroy']);
 
 
 #User Profile
@@ -118,5 +118,7 @@ Route::get('/4', function () {
     return Inertia::render('Chef/Create_post');  // Path relative to 'resources/js/Pages/'
 });
 
+
+Route::post('/apply-chef', [ChefApplicationController::class, 'applyChef']);
 
 require __DIR__.'/auth.php';

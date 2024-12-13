@@ -19,6 +19,10 @@ class Review extends Model
         'Created_by',
     ];
 
+    protected $policies = [
+        \App\Models\Review::class => \App\Policies\ReviewPolicy::class,
+    ];
+    
     /**
      * Relationship to the User who wrote the review.
      */

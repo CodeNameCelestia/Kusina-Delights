@@ -48,6 +48,7 @@
                 <p><strong>Cooking Time:</strong> {{ recipe.CookingTime || 'N/A' }} minutes</p>
                 <p><strong>Difficulty:</strong> {{ recipe.Difficulty || 'N/A' }}</p>
                 <p><strong>Servings:</strong> {{ recipe.Servings || 'N/A' }}</p>
+                <p><strong>Recipe By:</strong> {{ recipe.chef?.user?.name || 'Unknown' }}</p>
             </div>
             <br>
             <!-- Description -->

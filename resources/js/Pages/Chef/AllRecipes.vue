@@ -143,6 +143,7 @@ export default {
       return pages;
     },
   },
+  
   methods: {
     // Function to handle recipe deletion
     async deleteRecipe(recipeId) {

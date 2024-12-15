@@ -16,7 +16,7 @@ class RecipeViewerController extends Controller
 {
     public function show($id)
     {
-        $recipe = Recipe::with('reviews.user', 'chef')->findOrFail($id);
+        $recipe = Recipe::with('reviews.user', 'chef', 'chef.user')->findOrFail($id);
         $viewCount = RecipeView::where('recipe_id', $id)->count();
         $user = Auth::user(); // Get the authenticated user
     

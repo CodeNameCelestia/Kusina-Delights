@@ -138,7 +138,7 @@
                 Create
               </button>
 
-              <a href="/dashboard">
+              <a href="/chef/dashboard">
                 <button
                   type="button"
                   class="bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-8 rounded-md shadow-md"

@@ -182,21 +182,22 @@ class RecipeController extends Controller
         // Fetch Famous Filipino Delights: Recipes with highest average rating and reviews
         $famousDelights = Recipe::withCount('reviews')
             ->withAvg('reviews', 'star') // Get average rating
+            ->with('chef.user') // Include the chef and user relationship
             ->orderByDesc('reviews_count')
             ->orderByDesc('reviews_avg_star') // First by reviews count, then by average rating
             ->take(3) // Limit to top 3
             ->get();
 
         // Fetch Recent Recipes: Sorted by creation date (most recent first)
-        $recentRecipes = Recipe::latest()->take(5)->get(); // Limit to top 3 most recent
+        $recentRecipes = Recipe::with('chef.user') // Include the chef and user relationship
+            ->latest()
+            ->take(4)
+            ->get();
 
         return Inertia::render('Webpages/Recipes', [
             'famousDelights' => $famousDelights,
-            'recentRecipes' => $recentRecipes
+            'recentRecipes' => $recentRecipes,
         ]);
     }
-
-    
-    
 
 }

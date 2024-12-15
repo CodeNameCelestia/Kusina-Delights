@@ -18,8 +18,11 @@
         @routes
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     </head>
     <body class="font-sans antialiased">
+
         @inertia
     </body>
 </html>

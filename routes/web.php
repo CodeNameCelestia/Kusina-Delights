@@ -52,12 +52,7 @@ Route::get('/storage/{file}', function ($file) {
 
 
 # Crud for admin and backend shiz
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-Route::resource('users', UserController::class);
-Route::resource('recipes', RecipeController::class);
-Route::resource('reviews', ReviewController::class);
+
 
 
 # Views and filters for front end
@@ -73,21 +68,16 @@ Route::delete('api/recipes/{recipe}/reviews/{reviewId}', [RecipeViewerController
 
 
 #User Profile
-Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-Route::post('/update-introduction', [ProfileController::class, 'updateIntroduction'])->name('update.introduction');
-Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-Route::get('/api/profile', [ProfileController::class, 'getProfile']);
+
 #Route::post('/profile/upload-image', [ProfileController::class, 'uploadProfileImage'])->name('profile.upload.image');
 
 #Chef Dashboard
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'Roles:chef,admin'])->group(function () {
     Route::get('/chef/dashboard', [ChefDashboardController::class, 'index'])->name('chef.dashboard');
     Route::get('/chef/dashboard/recipes/create', [ChefDashboardController::class, 'create'])->name('chef.recipes.create');
     Route::post('/chef/dashboard/recipes', [ChefDashboardController::class, 'store']);
-        // Show the edit form
+     // Show the edit form
     Route::get('/chef/dashboard/recipes/{id}/edit', [ChefDashboardController::class, 'edit'])->name('chef.recipes.edit');
-
     // Update the recipe
     Route::put('/chef/dashboard/recipes/{id}/update', [ChefDashboardController::class, 'update']);
     Route::delete('/chef/dashboard/recipes/{id}', [ChefDashboardController::class, 'destroy'])->name('chef.recipes.destroy');
@@ -96,29 +86,30 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+#User Dashboard
+Route::middleware(['auth', 'Roles:user,chef,admin'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 
-// Route to update a recipe (using PUT or PATCH)
-
-
-
-#Samples
-Route::get('/1', function () {
-    return Inertia::render('Chef/Profile');  // Path relative to 'resources/js/Pages/'
+    Route::post('/update-introduction', [ProfileController::class, 'updateIntroduction'])->name('update.introduction');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/api/profile', [ProfileController::class, 'getProfile']);
 });
 
-Route::get('/2', function () {
-    return Inertia::render('Chef/Profile_edit');  // Path relative to 'resources/js/Pages/'
-});
-
-Route::get('/3', function () {
-    return Inertia::render('Chef/Dashboard');  // Path relative to 'resources/js/Pages/'
-});
-
-Route::get('/4', function () {
-    return Inertia::render('Chef/Create_post');  // Path relative to 'resources/js/Pages/'
+#Admin Dashboard
+Route::middleware(['auth', 'Roles:admin'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->middleware(['auth', 'verified'])->name('dashboard');
+    Route::resource('users', UserController::class);
+    Route::resource('recipes', RecipeController::class);
+    Route::resource('reviews', ReviewController::class);
 });
 
 
 Route::post('/apply-chef', [ChefApplicationController::class, 'applyChef']);
+
+
+
 
 require __DIR__.'/auth.php';

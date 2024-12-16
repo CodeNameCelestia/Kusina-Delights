@@ -87,5 +87,6 @@ import Layout from '../../Layouts/frontend.vue';
       Layout,
     },
   };
+  
   </script>
   

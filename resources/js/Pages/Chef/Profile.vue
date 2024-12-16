@@ -170,96 +170,108 @@
           </div>
 
           <!-- Modal -->
-          <div
-            v-if="showModal"
-            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-          >
-            <div
-              class="bg-white w-full max-w-lg p-8 rounded-xl shadow-2xl relative"
-            >
-              <!-- Close Button -->
-              <button
-                @click="showModal = false"
-                class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                aria-label="Close Modal"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+<!-- Modal -->
+<div
+  v-if="showModal"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+>
+  <div
+    class="bg-gradient-to-r from-yellow-200 to-yellow-300 w-full max-w-lg p-10 rounded-2xl shadow-3xl relative"
+  >
+    <!-- Close Button -->
+    <button
+      @click="showModal = false"
+      class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-all"
+      aria-label="Close Modal"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
 
-              <!-- Title -->
-              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-                Apply to Be a Chef
-              </h2>
+    <!-- Logo Image (Centered and Larger) -->
+    <div class="flex justify-center mb-8">
+      <img :src="logo" alt="Logo" class="h-36 w-36 object-contain shadow-lg rounded-full" />
+    </div>
 
-              <!-- Form -->
-              <form @submit.prevent="submitApplication">
-                <!-- Message Field -->
-                <div class="mb-6">
-                  <label
-                    for="message"
-                    class="block text-sm font-semibold text-gray-700 mb-2"
-                  >
-                    Message:
-                  </label>
-                  <textarea
-                    id="message"
-                    v-model="message"
-                    class="w-full border rounded-md p-3 text-gray-800 focus:ring-2 focus:ring-yellow-500 focus:outline-none resize-none"
-                    placeholder="Write your application message here..."
-                    rows="5"
-                    required
-                  ></textarea>
-                </div>
+    <!-- Title -->
+    <h2 class="text-3xl font-extrabold text-gray-800 mb-8 text-center">
+      Apply to Be a Chef
+    </h2>
+    <p><strong>User ID:</strong> {{ user.id }}</p>
+    <p><strong>Name:</strong> {{ user.name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
 
-                <!-- File Upload -->
-                <div class="mb-6">
-                  <label
-                    for="files"
-                    class="block text-sm font-semibold text-gray-700 mb-2"
-                  >
-                    Upload Files:
-                  </label>
-                  <input
-                    id="files"
-                    type="file"
-                    @change="handleFileUpload"
-                    multiple
-                    class="w-full border rounded-md p-2 text-gray-800 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
-                  />
-                </div>
+    <!-- Form -->
+    <form @submit.prevent="submitApplication">
+      <!-- Message Field -->
+      <div class="mb-8">
+        <label
+          for="message"
+          class="block text-sm font-semibold text-gray-700 mb-3"
+        >
+          Message:
+        </label>
+        <textarea
+          id="message"
+          v-model="message"
+          class="w-full border-2 border-yellow-500 rounded-lg p-4 text-gray-800 focus:ring-4 focus:ring-yellow-500 focus:outline-none resize-none transition-all"
+          placeholder="Write your application message here..."
+          rows="6"
+          required
+        ></textarea>
+      </div>
 
-                <!-- Buttons -->
-                <div class="flex justify-between items-center gap-4">
-                  <button
-                    type="button"
-                    @click="showModal = false"
-                    class="w-full py-3 px-5 bg-gray-200 text-gray-800 rounded-lg text-sm font-semibold hover:bg-gray-300 transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    class="w-full py-3 px-5 bg-yellow-500 text-white rounded-lg text-sm font-semibold hover:bg-yellow-700 shadow-lg transition"
-                  >
-                    Submit Application
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+      <!-- File Upload -->
+      <div class="mb-8">
+        <label
+          for="files"
+          class="block text-sm font-semibold text-gray-700 mb-3"
+        >
+          Upload Files:
+        </label>
+        <input
+          id="files"
+          type="file"
+          @change="handleFileUpload"
+          multiple
+          class="w-full border-2 border-yellow-500 rounded-lg p-4 text-gray-800 focus:ring-4 focus:ring-yellow-500 focus:outline-none transition-all"
+        />
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-between gap-6">
+        <button
+          type="button"
+          @click="showModal = false"
+          class="w-full py-4 px-6 bg-gray-200 text-gray-800 rounded-lg text-sm font-semibold hover:bg-gray-300 transition-all"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="w-full py-4 px-6 bg-yellow-500 text-white rounded-lg text-sm font-semibold hover:bg-yellow-600 shadow-2xl transition-all"
+        >
+          Submit Application
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
 
 
           <div v-if="isSubmitting" class="flex items-center justify-center">
@@ -277,6 +289,7 @@
   import { usePage } from "@inertiajs/vue3";
   import Swal from "sweetalert2"; // Import SweetAlert2
   
+  const logo = '/storage/logo3.png';
   const { props } = usePage();
   const user = reactive({
     ...props.user,
@@ -405,6 +418,10 @@
   
     const formData = new FormData();
     formData.append("message", message.value);
+    formData.append("user_id", user.id);
+    formData.append("user_name", user.name);
+    formData.append("user_email", user.email);
+  
     files.value.forEach((file, index) => {
       formData.append(`files[${index}]`, file);
     });

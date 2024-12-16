@@ -5,46 +5,41 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class ApplicationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $messageContent;
-    public $files;
+    public $applicationData;
 
-    /**
-     * Create a new message instance.
-     *
-     * @param string $messageContent
-     * @param array $files
-     */
-    public function __construct($messageContent, $files)
+    public function __construct($applicationData)
     {
-        $this->messageContent = $messageContent;
-        $this->files = $files;
+        $this->applicationData = $applicationData;
     }
 
-    /**
-     * Build the message.
-     *
-     * @return $this
-     */
     public function build()
     {
-        $email = $this->subject('Chef Application')
-            ->html("<p>{$this->messageContent}</p>");
-    
-        // Attach files if provided
-        foreach ($this->files as $file) {
-            $email->attach($file->getRealPath(), [
-                'as' => $file->getClientOriginalName(),
-                'mime' => $file->getMimeType(),
-            ]);
+        $mail = $this->subject('New Chef Application')
+            ->html("
+                <h1>New Chef Application</h1>
+                <p><strong>From:</strong> {$this->applicationData['user_name']}</p>
+                <p><strong>Email:</strong> {$this->applicationData['user_email']}</p>
+                <p><strong>User ID:</strong> {$this->applicationData['user_id']}</p>
+                <p><strong>Message:</strong></p>
+                <p>{$this->applicationData['message']}</p>
+                <p>Please check the attached files for more information.</p>
+            ");
+
+        // Attach files if any
+        if (isset($this->applicationData['files']) && !empty($this->applicationData['files'])) {
+            foreach ($this->applicationData['files'] as $file) {
+                $mail->attach($file->getRealPath(), [
+                    'as' => $file->getClientOriginalName(),
+                    'mime' => $file->getMimeType(),
+                ]);
+            }
         }
-    
-        return $email;
+
+        return $mail;
     }
-    
 }

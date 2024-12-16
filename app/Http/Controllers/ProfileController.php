@@ -46,6 +46,7 @@ class ProfileController extends Controller
     
         return Inertia::render('Chef/Profile', [
             'user' => [
+                'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'date_joined' => $user->created_at->format('F j, Y'),

@@ -86,4 +86,26 @@ class RecipeViewerController extends Controller
     
     
 
+    public function updateReview(Request $request, $recipeId, $reviewId)
+    {
+        $review = Review::findOrFail($reviewId);
+        
+        // Check if the authenticated user owns this review
+        if ($review->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'review' => 'required|string',
+            'star' => 'required|integer|min:1|max:5',
+        ]);
+
+        $review->update([
+            'Review' => $validated['review'],
+            'Star' => $validated['star'],
+        ]);
+
+        return response()->json($review->load('user'));
+    }
+
 }

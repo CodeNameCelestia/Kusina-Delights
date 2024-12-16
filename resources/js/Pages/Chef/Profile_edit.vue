@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <div class="relative h-[998px] overflow-hidden">
+    <div class="relative overflow-hidden">
       <!-- Wrapper for blurred background -->
       <div class="absolute inset-0 -m-[20px]">
         <div
@@ -10,7 +10,7 @@
       </div>
 
       <!-- Main content -->
-      <div class="flex items-center justify-center h-full relative px-8 sm:px-12 lg:px-16">
+      <div class="flex items-center justify-center h-full relative px-8 sm:px-12 lg:px-16 mt-10  mb-10">
         <div class="bg-white w-full max-w-[1400px] p-10 sm:p-16 lg:p-20 rounded-2xl shadow-lg flex gap-10 flex-wrap lg:flex-nowrap">
           <!-- Profile Card -->
           <div class="bg-yellow-300 flex-1 h-[600px] p-10 rounded-[2rem] shadow-md relative">

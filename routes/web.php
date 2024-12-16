@@ -79,7 +79,7 @@ Route::middleware(['auth', 'Roles:chef,admin'])->group(function () {
      // Show the edit form
     Route::get('/chef/dashboard/recipes/{id}/edit', [ChefDashboardController::class, 'edit'])->name('chef.recipes.edit');
     // Update the recipe
-    Route::put('/chef/dashboard/recipes/{id}/update', [ChefDashboardController::class, 'update']);
+    Route::put('/chef/dashboard/recipes/{id}/update', [ChefDashboardController::class, 'update'])->name('chef.recipes.update');
     Route::delete('/chef/dashboard/recipes/{id}', [ChefDashboardController::class, 'destroy'])->name('chef.recipes.destroy');
     Route::get('/chef/dashboard/recipes/all', [ChefDashboardController::class, 'showAllRecipes'])->name('chef.recipes.showAll');
 
@@ -89,11 +89,14 @@ Route::middleware(['auth', 'Roles:chef,admin'])->group(function () {
 #User Dashboard
 Route::middleware(['auth', 'Roles:user,chef,admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('api/recipes/{recipe}/reviews/{reviewId}', [RecipeViewerController::class, 'updateReview']);
 
     Route::post('/update-introduction', [ProfileController::class, 'updateIntroduction'])->name('update.introduction');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/api/profile', [ProfileController::class, 'getProfile']);
+    Route::post('/apply-chef', [ChefApplicationController::class, 'applyChef']);
+
 });
 
 #Admin Dashboard
@@ -107,7 +110,6 @@ Route::middleware(['auth', 'Roles:admin'])->group(function () {
 });
 
 
-Route::post('/apply-chef', [ChefApplicationController::class, 'applyChef']);
 
 
 

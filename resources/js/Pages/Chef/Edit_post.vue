@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <div class="relative h-[998px] overflow-hidden">
+    <div class="relative overflow-hidden">
       <div class="absolute inset-0 -m-[20px]">
         <div
           class="absolute inset-0 bg-cover bg-center"
@@ -8,7 +8,7 @@
         ></div>
       </div>
 
-      <div class="flex items-center justify-center h-full relative px-10 sm:px-12 lg:px-16">
+      <div class="flex items-center justify-center h-full relative px-10 sm:px-12 lg:px-16 mt-10  mb-10">
         <div class="bg-white w-full max-w-[200vh] p-12 sm:p-16 lg:p-20 rounded-2xl shadow-lg">
           <h1 class="text-center text-large font-bold mb-10">Edit Recipe</h1>
 
@@ -105,6 +105,17 @@
               />
             </div>
 
+            <!-- Video Link -->
+            <div class="col-span-1">
+              <label class="block text-lg font-semibold mb-2">YouTube Video Link</label>
+              <input 
+                type="url" 
+                v-model="form.VideoLink" 
+                placeholder="https://www.youtube.com/watch?v=..."
+                class="w-full border border-gray-300 shadow-sm rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              />
+            </div>
+
             <!-- Buttons -->
             <div class="col-span-3 flex justify-center mt-6">
               <button
@@ -127,6 +138,7 @@ import { ref } from "vue";
 import { usePage } from '@inertiajs/vue3';
 import { Inertia } from '@inertiajs/inertia';
 import Swal from 'sweetalert2';  // Import SweetAlert2
+import axios from 'axios';
 
 // Props passed from the controller
 const props = defineProps({
@@ -134,7 +146,18 @@ const props = defineProps({
 });
 
 // Initialize the form with recipe data
-const form = ref({ ...props.recipe });
+const form = ref({
+    RecipeTitle: props.recipe.RecipeTitle,
+    Description: props.recipe.Description,
+    Ingredients: props.recipe.Ingredients,
+    Instructions: props.recipe.Instructions,
+    Preparation: props.recipe.Preparation,
+    CookingTime: props.recipe.CookingTime,
+    Difficulty: props.recipe.Difficulty,
+    Servings: props.recipe.Servings,
+    RecipePhoto: null,
+    VideoLink: props.recipe.VideoLink || '',
+});
 const imagePreview = ref(props.recipe.RecipePhoto ? `/storage/${props.recipe.RecipePhoto}` : null);
 
 const handleFileChange = (event) => {
@@ -146,69 +169,66 @@ const handleFileChange = (event) => {
 };
 
 const submitForm = async () => {
-  try {
-    // Show confirmation dialog before submitting
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: "Do you want to update this recipe?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, update it!',
-      cancelButtonText: 'No, cancel!',
-      background: 'rgba(255, 255, 255, 1)', // White background for clarity
-      confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
-      cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
-      iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
-      customClass: {
-        popup: 'swal-popup', // Add a custom class for further styling if needed
-      },
-    });
+    try {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to update this recipe?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'No, cancel!',
+            background: 'rgba(255, 255, 255, 1)', // White background for clarity
+            confirmButtonColor: 'rgba(204, 162, 35, 1)', // Golden Yellow for confirm button
+            cancelButtonColor: 'rgba(54, 69, 79, 1)', // Charcoal Gray for cancel button to provide contrast
+            iconColor: 'rgba(255, 219, 99, 1)', // Golden yellow for icon color for consistency
+            customClass: {
+                popup: 'swal-popup', // Add a custom class for further styling if needed
+            },
+        });
 
-    if (result.isConfirmed) {
-      // Create a FormData object to send the data
-      const formData = new FormData();
+        if (result.isConfirmed) {
+            const formData = new FormData();
+            
+            // Append all form fields to FormData
+            Object.keys(form.value).forEach(key => {
+                if (form.value[key] !== null && form.value[key] !== undefined) {
+                    if (key === 'RecipePhoto' && form.value[key] instanceof File) {
+                        formData.append(key, form.value[key]);
+                    } else if (key !== 'RecipePhoto') {
+                        formData.append(key, form.value[key]);
+                    }
+                }
+            });
 
-      // Loop through each form field and append to the FormData object
-      for (const [key, value] of Object.entries(form.value)) {
-        if (value !== undefined && value !== null) {
-          formData.append(key, value);
+            await axios.post(`/chef/dashboard/recipes/${props.recipe.RecipeID}/update`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-HTTP-Method-Override': 'PUT'
+                }
+            });
+
+            // Show success message
+            await Swal.fire({
+                title: 'Success!',
+                text: 'Recipe updated successfully',
+                icon: 'success',
+                confirmButtonColor: 'rgba(204, 162, 35, 1)',
+            });
+
+            // Redirect to dashboard
+            window.location.href = '/chef/dashboard';
         }
-      }
-
-      // Send the form data to the backend for updating the recipe
-      await Inertia.put(`/chef/dashboard/recipes/${props.recipe.RecipeID}/update`, formData, {
-        preserveState: true, // Preserve form state after submission
-        onFinish: () => {
-          // Handle after the form submission (optional, for example, show a success message)
-          Swal.fire({
-            title: 'Updated!',
-            text: 'Your recipe has been successfully updated.',
-            icon: 'success',
-            confirmButtonText: 'Okay',
-          });
-        },
-      });
-    } else {
-      // If canceled, show a message (optional)
-      Swal.fire({
-        title: 'Cancelled',
-        text: 'Your recipe update has been cancelled.',
-        icon: 'info',
-        confirmButtonText: 'Okay',
-      });
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: error.response?.data?.error || 'Failed to update recipe',
+            icon: 'error',
+            confirmButtonColor: 'rgba(204, 162, 35, 1)',
+        });
     }
-  } catch (error) {
-    console.error('Error updating recipe:', error);
-
-    // Show error alert if something goes wrong
-    Swal.fire({
-      title: 'Error!',
-      text: 'There was an issue updating your recipe. Please try again.',
-      icon: 'error',
-      confirmButtonText: 'Okay',
-    });
-  }
 };
+
 </script>
 
 

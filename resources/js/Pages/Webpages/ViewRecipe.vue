@@ -58,6 +58,20 @@
             </div>
         </div>
 
+        <!-- Video Section -->
+        <div v-if="recipe.VideoLink" class="mx-auto text-left max-w-4xl my-8">
+            <p class="text-small font-bold mb-4">Video Tutorial</p>
+            <div class="aspect-w-16 aspect-h-9">
+                <iframe
+                    :src="getEmbedUrl(recipe.VideoLink)"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    class="w-full h-[480px] rounded-lg"
+                ></iframe>
+            </div>
+        </div>
+
         <!-- Reviews Section -->
         <div class="p-6 bg-gray-100 rounded-lg max-w-6xl mx-auto space-y-4 mt-8">
             <h2 class="text-2xl font-bold">Reviews</h2>
@@ -106,7 +120,14 @@
                             </div>
                             
                             <!-- Delete Review Button -->
-                            <div class="flex justify-center">
+                            <div class="flex justify-center space-x-2">
+                                <button
+                                    v-if="review.user.id === user.id"
+                                    @click="startEditing(review)" 
+                                    class="bg-blue-400 text-white font-semibold py-1 px-3 rounded-lg hover:bg-blue-500 text-sm"
+                                >
+                                    Edit
+                                </button>
                                 <button
                                     v-if="review.user.id === user.id"
                                     @click="deleteReview(review.ReviewsID)" 
@@ -157,6 +178,35 @@
                 </div>
             </div>
 
+            <!-- Add edit form modal -->
+            <div v-if="editingReview" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-lg w-96">
+                    <h3 class="text-lg font-bold mb-4">Edit Review</h3>
+                    <textarea
+                        v-model="editReviewText"
+                        class="w-full p-3 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 resize-none text-small mb-4"
+                    ></textarea>
+                    <div class="flex items-center space-x-1 text-2xl mb-4">
+                        <p>Rate:</p>
+                        <svg v-for="star in 5" :key="star" @click="editRating = star" :class="{
+                            'fill-yellow-500': editRating >= star,
+                            'fill-gray-300': editRating < star,
+                            'cursor-pointer': true,
+                            'hover:fill-yellow-400': true,
+                            'transition-colors': true
+                        }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                            <path :d="editRating >= star ? 
+                            'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z' : 
+                            'M12 15.4l3.76 2.28-1-4.17 3.27-2.84-4.28-.38L12 4.75l-1.75 5.68-4.28.38 3.27 2.84-1 4.17z'" />
+                        </svg>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button @click="cancelEdit" class="bg-gray-400 text-white px-4 py-2 rounded">Cancel</button>
+                        <button @click="saveEdit" class="bg-green-400 text-white px-4 py-2 rounded">Save</button>
+                    </div>
+                </div>
+            </div>
+
 
 
     </Layout>
@@ -180,6 +230,9 @@ export default {
             rating: 0,
             reviewText: '',
             userHasReviewed: false, // Check if the user has already reviewed
+            editingReview: null,
+            editReviewText: '',
+            editRating: 0,
         };
     },
     mounted() {
@@ -254,7 +307,83 @@ export default {
             } catch (error) {
                 console.error('Error deleting review:', error);
             }
-        }
+        },
+
+        startEditing(review) {
+            this.editingReview = review;
+            this.editReviewText = review.Review;
+            this.editRating = review.Star;
+        },
+
+        cancelEdit() {
+            this.editingReview = null;
+            this.editReviewText = '';
+            this.editRating = 0;
+        },
+
+        async saveEdit() {
+            if (!this.editingReview) return;
+
+            try {
+                const response = await axios.put(
+                    `/api/recipes/${this.recipe.RecipeID}/reviews/${this.editingReview.ReviewsID}`,
+                    {
+                        review: this.editReviewText,
+                        star: this.editRating
+                    }
+                );
+
+                // Show success message
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Review updated successfully',
+                    icon: 'success',
+                    confirmButtonColor: 'rgba(204, 162, 35, 1)',
+                });
+
+                // Update the review in the local state
+                const index = this.recipe.reviews.findIndex(
+                    r => r.ReviewsID === this.editingReview.ReviewsID
+                );
+                if (index !== -1) {
+                    this.recipe.reviews[index] = response.data;
+                }
+
+                this.cancelEdit();
+                location.reload(); // Refresh to show updated review
+            } catch (error) {
+                console.error('Error updating review:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to update review',
+                    icon: 'error',
+                    confirmButtonColor: 'rgba(204, 162, 35, 1)',
+                });
+            }
+        },
+
+        getEmbedUrl(url) {
+            if (!url) return '';
+            
+            // Handle different YouTube URL formats
+            let videoId = '';
+            
+            // Handle standard YouTube URLs
+            if (url.includes('youtube.com/watch?v=')) {
+                videoId = url.split('v=')[1];
+            }
+            // Handle youtu.be URLs
+            else if (url.includes('youtu.be/')) {
+                videoId = url.split('youtu.be/')[1];
+            }
+            
+            // Remove any additional parameters
+            if (videoId.includes('&')) {
+                videoId = videoId.split('&')[0];
+            }
+            
+            return `https://www.youtube.com/embed/${videoId}`;
+        },
     },
 };
 </script>

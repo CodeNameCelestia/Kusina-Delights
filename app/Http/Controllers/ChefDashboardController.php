@@ -95,6 +95,7 @@ class ChefDashboardController extends Controller
             'CookingTime' => 'nullable|integer',
             'Difficulty' => 'nullable|string',
             'Servings' => 'nullable|integer',
+            'VideoLink' => 'nullable|url',
         ]);
     
         $chef = Auth::user()->chef;
@@ -137,54 +138,45 @@ class ChefDashboardController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'RecipeTitle' => 'required|string|max:255',
-            'Description' => 'nullable|string',
-            'Ingredients' => 'nullable|string',
-            'RecipePhoto' => 'nullable|image|max:10240',
-            'Preparation' => 'nullable|integer',
-            'CookingTime' => 'nullable|integer',
-            'Difficulty' => 'nullable|string',
-            'Servings' => 'nullable|integer',
-        ]);
-        
-        $chef = Auth::user()->chef;
-        
-        if (!$chef) {
-            return response()->json(['message' => 'Chef not found'], 403);
-        }
-        
-        $recipe = Recipe::find($id);
-        
-        if (!$recipe) {
-            return response()->json(['message' => 'Recipe not found'], 404);
-        }
-    
-        if ($recipe->chef_id !== $chef->ChefID) {
-            return response()->json(['message' => 'Unauthorized to update this recipe'], 403);
-        }
-    
-        $recipe->RecipeTitle = $validated['RecipeTitle'];
-        $recipe->Description = $validated['Description'];
-        $recipe->Ingredients = $validated['Ingredients'];
-        $recipe->VideoLink = $request->VideoLink;
-        $recipe->Instructions = $request->Instructions;
-        $recipe->Preparation = $request->Preparation;
-        $recipe->CookingTime = $request->CookingTime;
-        $recipe->Difficulty = $request->Difficulty;
-        $recipe->Servings = $request->Servings;
-    
-        if ($request->hasFile('RecipePhoto')) {
-            if ($recipe->RecipePhoto) {
-                Storage::disk('public')->delete($recipe->RecipePhoto);
+        try {
+            $recipe = Recipe::findOrFail($id);
+            
+            // Check if the authenticated chef owns this recipe
+            $chef = Auth::user()->chef;
+            if ($recipe->chef_id !== $chef->ChefID) {
+                return response()->json(['message' => 'Unauthorized'], 403);
             }
-            $path = $request->file('RecipePhoto')->store('recipes', 'public');
-            $recipe->RecipePhoto = $path;
+
+            $validated = $request->validate([
+                'RecipeTitle' => 'required|string|max:255',
+                'Description' => 'nullable|string',
+                'Ingredients' => 'required|string',
+                'Instructions' => 'required|string',
+                'Preparation' => 'nullable|integer',
+                'CookingTime' => 'nullable|integer',
+                'Difficulty' => 'nullable|string',
+                'Servings' => 'nullable|integer',
+                'RecipePhoto' => 'nullable|image|max:10240',
+                'VideoLink' => 'nullable|url',
+            ]);
+
+            // Handle file upload if RecipePhoto is provided
+            if ($request->hasFile('RecipePhoto')) {
+                // Delete old photo if exists
+                if ($recipe->RecipePhoto) {
+                    Storage::disk('public')->delete($recipe->RecipePhoto);
+                }
+                $validated['RecipePhoto'] = $request->file('RecipePhoto')->store('recipes', 'public');
+            }
+
+            // Update recipe with validated data
+            $recipe->update($validated);
+
+            return response()->json(['message' => 'Recipe updated successfully']);
+        } catch (\Exception $e) {
+            Log::error('Error updating recipe:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to update recipe'], 500);
         }
-    
-        $recipe->save();
-        
-        return response()->json(['message' => 'Recipe updated successfully']);
     }
 
     public function destroy($id)

@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <div class="relative h-[998px] overflow-hidden">
+    <div class="relative overflow-hidden">
       <!-- Wrapper for the blurred background with padding to avoid blurred borders -->
       <div class="absolute inset-0 -m-[20px]">
         <div
@@ -10,7 +10,7 @@
       </div>
 
       <!-- Main content -->
-      <div class="flex items-center justify-center h-full relative">
+      <div class="flex items-center justify-center h-full relative mt-10  mb-10">
         <div class="bg-white w-[200vh] p-12 rounded-3xl shadow-2xl">
           <h1 class="text-center text-large font-bold mb-10">Dashboard</h1>
           <div class="flex gap-12">

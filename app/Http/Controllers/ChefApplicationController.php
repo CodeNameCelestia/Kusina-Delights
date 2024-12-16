@@ -20,7 +20,7 @@ class ChefApplicationController extends Controller
             $file->store('applications');
         }
 
-        Mail::to('banguist@gmail.com')->send(new ApplicationMail($request->message, $files));
+        Mail::to('cameraexpert17@gmail.com')->send(new ApplicationMail($request->message, $files));
 
         return response()->json(['message' => 'Application sent successfully!']);
     }

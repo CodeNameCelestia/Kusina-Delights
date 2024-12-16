@@ -1,6 +1,6 @@
 <template>
     <Layout>
-      <div class="relative h-[998px] overflow-hidden">
+      <div class="relative overflow-hidden">
         <!-- Blurred Background -->
         <div class="absolute inset-0 -m-[20px]">
           <div
@@ -10,7 +10,7 @@
         </div>
   
         <!-- Main Content -->
-        <div class="flex items-center justify-center h-full relative px-12 sm:px-16 lg:px-20">
+        <div class="flex items-center justify-center h-full relative px-12 sm:px-16 lg:px-20 mt-10  mb-10">
           <div class="bg-white w-full max-w-[1600px] p-12 sm:p-16 lg:p-20 rounded-2xl shadow-lg flex gap-12">
             <!-- Profile Card -->
             <div
@@ -41,35 +41,34 @@
 
               <!-- Buttons Container -->
               <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col space-y-4">
-                
-                <!--Chef-->
-                <button
-                    @click="showModal = true"
-                    class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
-                  >
-                    Apply to be a Chef
-                </button>
-
-                <!--Admin
+                <!-- Admin Dashboard - Show only for admins -->
                 <a
+                  v-if="user.role === 'admin'"
                   href="/dashboard"
                   class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
                 >
-                  Admin Dasboard
+                  Admin Dashboard
                 </a>
-                -->
 
-
-                
-                <!--Chef Dashboard-->
-                
+                <!-- Chef Dashboard - Show only for chefs -->
                 <a
+                  v-if="user.role === 'chef'"
                   href="/chef/dashboard"
                   class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
                 >
-                  Chef Dasboard
+                  Chef Dashboard
                 </a>
-                <!--Logout-->
+
+                <!-- Apply to be Chef button - Show only for regular users -->
+                <button
+                  v-if="user.role === 'user'"
+                  @click="showModal = true"
+                  class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
+                >
+                  Apply to be a Chef
+                </button>
+
+                <!-- Logout - Show for all users -->
                 <button
                   @click="logout"
                   class="w-[20vh] bg-green-300 text-black py-2 px-10 rounded-2xl font-semibold shadow-[5px_5px_15px_rgba(0,0,0,0.3)] text-small flex items-center justify-center text-center"
@@ -176,54 +175,92 @@
             class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
           >
             <div
-              class="bg-white w-full max-w-lg p-6 rounded-lg shadow-lg relative"
+              class="bg-white w-full max-w-lg p-8 rounded-xl shadow-2xl relative"
             >
-              <h2 class="text-xl font-semibold mb-4">Apply to be a Chef</h2>
+              <!-- Close Button -->
+              <button
+                @click="showModal = false"
+                class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                aria-label="Close Modal"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-6 h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              <!-- Title -->
+              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                Apply to Be a Chef
+              </h2>
 
               <!-- Form -->
               <form @submit.prevent="submitApplication">
-                <div class="mb-4">
-                  <label for="message" class="block text-gray-700 font-medium mb-2">Message:</label>
+                <!-- Message Field -->
+                <div class="mb-6">
+                  <label
+                    for="message"
+                    class="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    Message:
+                  </label>
                   <textarea
                     id="message"
                     v-model="message"
-                    class="w-full border rounded-md p-2"
+                    class="w-full border rounded-md p-3 text-gray-800 focus:ring-2 focus:ring-yellow-500 focus:outline-none resize-none"
                     placeholder="Write your application message here..."
-                    rows="4"
+                    rows="5"
                     required
                   ></textarea>
                 </div>
 
-                <div class="mb-4">
-                  <label for="files" class="block text-gray-700 font-medium mb-2">Upload Files:</label>
+                <!-- File Upload -->
+                <div class="mb-6">
+                  <label
+                    for="files"
+                    class="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    Upload Files:
+                  </label>
                   <input
                     id="files"
                     type="file"
                     @change="handleFileUpload"
                     multiple
-                    class="w-full border rounded-md p-2"
+                    class="w-full border rounded-md p-2 text-gray-800 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
                   />
                 </div>
 
                 <!-- Buttons -->
-                <div class="flex justify-end gap-4">
+                <div class="flex justify-between items-center gap-4">
                   <button
                     type="button"
                     @click="showModal = false"
-                    class="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400"
+                    class="w-full py-3 px-5 bg-gray-200 text-gray-800 rounded-lg text-sm font-semibold hover:bg-gray-300 transition"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600"
+                    class="w-full py-3 px-5 bg-yellow-500 text-white rounded-lg text-sm font-semibold hover:bg-yellow-700 shadow-lg transition"
                   >
-                    Save
+                    Submit Application
                   </button>
                 </div>
               </form>
             </div>
           </div>
+
 
           <div v-if="isSubmitting" class="flex items-center justify-center">
             <div class="spinner">Loading...</div>
@@ -241,7 +278,10 @@
   import Swal from "sweetalert2"; // Import SweetAlert2
   
   const { props } = usePage();
-  const user = reactive(props.user);
+  const user = reactive({
+    ...props.user,
+    role: props.user.role
+  });
   const profile = reactive(props.profile);
   const reviews = reactive(props.reviews);
   

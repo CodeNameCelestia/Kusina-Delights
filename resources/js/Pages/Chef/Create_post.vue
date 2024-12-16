@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <div class="relative h-[998px] overflow-hidden">
+    <div class="relative overflow-hidden">
       <div class="absolute inset-0 -m-[20px]">
         <div
           class="absolute inset-0 bg-cover bg-center"
@@ -8,7 +8,7 @@
         ></div>
       </div>
 
-      <div class="flex items-center justify-center h-full relative px-10 sm:px-12 lg:px-16">
+      <div class="flex items-center justify-center h-full relative px-10 sm:px-12 lg:px-16 mt-10  mb-10">
         <div class="bg-white w-full max-w-[200vh] p-12 sm:p-16 lg:p-20 rounded-2xl shadow-lg">
           <h1 class="text-center text-large font-bold mb-10">Create Recipe</h1>
 

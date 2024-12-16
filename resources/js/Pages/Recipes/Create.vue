@@ -71,6 +71,18 @@
         <input type="file" @change="handleFileChange" id="RecipePhoto" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-gray-500" />
       </div>
 
+      <!-- Video Link -->
+      <div>
+        <label for="VideoLink" class="block text-sm font-medium text-gray-700">YouTube Video Link</label>
+        <input 
+          type="url" 
+          id="VideoLink" 
+          v-model="form.VideoLink" 
+          placeholder="https://www.youtube.com/watch?v=..."
+          class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:outline-none" 
+        />
+      </div>
+
       <!-- Submit Button -->
       <div class="col-span-2 flex space-x-3 mt-6">
         <button type="submit" class="px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:ring-2 focus:ring-orange-500">Create Recipe</button>
@@ -102,6 +114,7 @@ const form = useForm({
   Difficulty: '',
   Servings: null,
   RecipePhoto: null,
+  VideoLink: props.recipe.VideoLink || '',
 });
 
 const handleFileChange = (event) => {

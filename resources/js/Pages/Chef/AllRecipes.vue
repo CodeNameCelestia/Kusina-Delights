@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <div class="relative h-[998px] overflow-hidden">
+    <div class="relative overflow-hidden">
       <!--Blurred Background-->
       <div class="absolute inset-0 -m-[20px]">
         <div class="absolute inset-0 bg-cover bg-center"
@@ -9,7 +9,7 @@
       
 
       <!--The Recipes-->
-      <div class="flex items-center justify-center h-full relative">
+      <div class="flex items-center justify-center h-full relative mt-10  mb-10">
         <div class="bg-white w-full max-w-screen-lg p-12 rounded-3xl shadow-2xl">
           <h1 class="text-center text-3xl font-bold mb-10">All Recipes</h1>
 

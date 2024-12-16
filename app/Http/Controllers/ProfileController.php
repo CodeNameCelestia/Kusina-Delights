@@ -50,6 +50,7 @@ class ProfileController extends Controller
                 'email' => $user->email,
                 'date_joined' => $user->created_at->format('F j, Y'),
                 'ProfileImage' => $profile->ProfileImage,
+                'role' => $user->Roles,  // Add this line to pass the user's role
             ],
             'profile' => [
                 'introduction' => $profile->Introduction ?? 'No introduction set yet',

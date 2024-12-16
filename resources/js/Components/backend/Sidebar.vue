@@ -15,48 +15,66 @@ const isActive = (basePath) => currentUrl.startsWith(basePath)
 <template>
   <div class="sidebar">
     <div class="bg-yellow-300 w-64 min-h-screen bg-white shadow-md">
-      <div class="flex items-center px-6 py-4 ">
+      <div class="flex items-center px-6 py-4">
         <!-- Logo Image -->
         <img :src="logoPath" alt="Logo" class="h-14" />
         <h1 class="ml-3 text-lg font-bold">Kusina Delights</h1>
       </div>
-      <nav class="mt-6">
+      <nav class="mt-6 space-y-1">
         <!-- Dashboard Link -->
-        <a 
-          href="/dashboard" 
-          :class="['flex items-center px-6 py-3 font-semibold', 
-                  isActive('/dashboard') ? 'bg-yellow-200 text-gray-900' : 'hover:bg-gray-100']"
+        <a
+          href="/dashboard"
+          :class="[
+            'flex items-center px-6 py-3 space-x-4 font-semibold transition-colors duration-200',
+            isActive('/dashboard') ? 'bg-yellow-200 text-gray-900' : 'hover:bg-gray-100 text-gray-600'
+          ]"
         >
-          <i class="fas fa-home mr-3"></i> Dashboard
+          
+          <span class="text-sm leading-tight">Dashboard</span>
+          <i class="fas fa-home text-lg"></i>
         </a>
 
         <!-- Recipes Link -->
-        <a 
-          href="/recipes" 
-          :class="['flex items-center px-6 py-3', 
-                  isActive('/recipes') ? 'bg-yellow-200 text-gray-900' : 'hover:bg-gray-100']"
+        <a
+          href="/recipes"
+          :class="[
+            'flex items-center px-6 py-3 space-x-4 font-semibold transition-colors duration-200',
+            isActive('/recipes') ? 'bg-yellow-200 text-gray-900' : 'hover:bg-gray-100 text-gray-600'
+          ]"
         >
-          <i class="fas fa-clipboard mr-3"></i> Recipes
+          
+          <span class="text-sm leading-tight">Recipes</span>
+          <i class="fas fa-clipboard text-lg"></i>
         </a>
 
         <!-- Reviews Link -->
-        <a 
-          href="/reviews" 
-          :class="['flex items-center px-6 py-3', 
-                  isActive('/reviews') ? 'bg-yellow-200 text-gray-900' : 'hover:bg-gray-100']"
+        <a
+          href="/reviews"
+          :class="[
+            'flex items-center px-6 py-3 space-x-4 font-semibold transition-colors duration-200',
+            isActive('/reviews') ? 'bg-yellow-200 text-gray-900' : 'hover:bg-gray-100 text-gray-600'
+          ]"
         >
-          <i class="fas fa-star mr-3"></i> Reviews
+          
+          <span class="text-sm leading-tight">Reviews</span>
+          <i class="fas fa-star text-lg"></i>
         </a>
 
         <!-- Users Link -->
-        <a 
-          href="/users" 
-          :class="['flex items-center px-6 py-3', 
-                  isActive('/users') ? 'bg-yellow-200 text-gray-900' : 'hover:bg-gray-100']"
+        <a
+          href="/users"
+          :class="[
+            'flex items-center px-6 py-3 space-x-4 font-semibold transition-colors duration-200',
+            isActive('/users') ? 'bg-yellow-200 text-gray-900' : 'hover:bg-gray-100 text-gray-600'
+          ]"
         >
-          <i class="fas fa-users mr-3"></i> Users
+          
+          <span class="text-sm leading-tight">Users</span>
+          <i class="fas fa-users text-lg"></i>
         </a>
       </nav>
     </div>
   </div>
 </template>
+
+

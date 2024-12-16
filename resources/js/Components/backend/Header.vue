@@ -1,27 +1,29 @@
-
 <script setup>
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
+import { ref } from 'vue'; // import ref for state management
 import { Link } from '@inertiajs/vue3';
+
+const isOpen = ref(false); // state to track if the dropdown is open
+const toggleDropdown = () => {
+  isOpen.value = !isOpen.value;
+};
 </script>
 
 <template>
     <header>
         <!-- Primary Navigation Menu -->
-        <div class="mx-auto max-w-7xl mb-10"    >
+        <div class="mx-auto max-w-7xl mb-10">
             <div class="flex h-16 justify-between">
                 <div class="flex">
                     <!-- Logo -->
                     <div class="flex shrink-0 items-center">
                         <Link :href="route('dashboard')">
-                            <ApplicationLogo
-                                class="block h-9 w-auto fill-current text-gray-800"
-                            />
+
                         </Link>
                     </div>
                 </div>
-
 
                 <div class="hidden sm:ms-6 sm:flex sm:items-center">
                     <!-- Settings Dropdown -->
@@ -31,21 +33,14 @@ import { Link } from '@inertiajs/vue3';
                                 <span class="inline-flex rounded-md">
                                     <button
                                         type="button"
-                                        class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                        class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-lg font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                        @click="toggleDropdown"
                                     >
-                                        {{ $page.props.auth.user.name }}
-
-                                        <svg
-                                            class="-me-0.5 ms-2 h-4 w-4"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                        >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                clip-rule="evenodd"
-                                            />
+                                        <!-- Username -->
+                                        <span class="mr-2">{{ $page.props.auth.user.name }}</span>
+                                        <!-- Arrow icon that changes based on dropdown state -->
+                                        <svg :class="{'rotate-180': isOpen}" class="transition-transform duration-300 w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                         </svg>
                                     </button>
                                 </span>
@@ -68,5 +63,11 @@ import { Link } from '@inertiajs/vue3';
             </div>
         </div>
     </header>
-  </template>
-  
+</template>
+
+<style scoped>
+/* Optional: Add some additional styling for a smoother transition of the arrow */
+.transition-transform {
+    transition: transform 0.3s ease;
+}
+</style>

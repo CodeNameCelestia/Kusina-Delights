@@ -124,7 +124,7 @@ class UserController extends Controller
             'profile.last_name' => 'required|string|max:100',
             'profile.middle_name' => 'nullable|string|max:100',
             'profile.introduction' => 'nullable|string',
-            'profile.profile_image' => 'nullable|string|starts_with:data:image/', // Validating base64 string
+            'profile.profile_image' => 'nullable|string',
             'chef.income' => 'nullable|numeric|min:0',
         ]);
     
@@ -182,15 +182,17 @@ class UserController extends Controller
             $user->profile()->update($profileData);
     
             // Handle chef-specific data
-            if ($user->Roles !== 'chef' && $user->chef) {
-                $user->chef()->delete();
-            }
-    
             if ($validated['role'] === 'chef') {
-                $user->chef()->updateOrCreate([], [
-                    'Income' => $validated['chef']['income'] ?? 0,
-                    'Created_by' => Auth::id(),
-                ]);
+                $user->chef()->updateOrCreate(
+                    [], // Empty array means find by user_id
+                    [
+                        'Income' => $validated['chef']['income'] ?? 0,
+                        'Created_by' => Auth::id(),
+                    ]
+                );
+            } elseif ($user->chef) {
+                // If user is no longer a chef, delete chef record
+                $user->chef()->delete();
             }
     
             DB::commit();

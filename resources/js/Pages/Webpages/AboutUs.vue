@@ -79,14 +79,27 @@
     </Layout>
   </template>
   
-  <script>
-import Layout from '../../Layouts/frontend.vue';
-  
-  export default {
-    components: {
-      Layout,
-    },
-  };
-  
+  <script setup>
+  import Layout from '../../Layouts/frontend.vue';
+  import { onMounted } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { ref } from 'vue'; // Import ref to use reactive variables
+onMounted(() => {
+const { auth } = usePage().props;
+
+// Only load scripts if user is logged in
+if (auth.user) {
+    // Create and append the first script
+    const script1 = document.createElement('script');
+    script1.src = 'https://cdn.botpress.cloud/webchat/v2.2/inject.js';
+    document.head.appendChild(script1);
+
+    // Create and append the second script
+    const script2 = document.createElement('script');
+    script2.src = 'https://files.bpcontent.cloud/2024/12/16/16/20241216164133-I8MIRLQE.js';
+    document.head.appendChild(script2);
+}
+}); 
+
   </script>
   

@@ -239,6 +239,7 @@ export default {
         this.userHasReviewed = this.recipe.reviews.some(
             (review) => review.user.id === this.user?.id
         );
+        
     },
     methods: {
         setRating(star) {

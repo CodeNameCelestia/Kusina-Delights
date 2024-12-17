@@ -196,7 +196,7 @@ class RecipeController extends Controller
         // Fetch Recent Recipes
         $recentRecipes = Recipe::with('chef.user')
             ->latest()
-            ->take(4)
+            ->take(10)
             ->get();
 
         return Inertia::render('Webpages/Recipes', [

@@ -114,7 +114,7 @@ const form = useForm({
     profile_image: profile.ProfileImage ? route('storage', profile.ProfileImage) : null,
   },
   chef: {
-    income: props.user.chef ? props.user.chef.Income : null,
+    income: props.user.chef ? props.user.chef.Income : 0,
   },
 });
 
@@ -131,32 +131,6 @@ const handleImageChange = (event) => {
 
 const submitForm = async () => {
   try {
-    const formData = new FormData();
-
-    // Append user data
-    formData.append('name', form.name);
-    formData.append('email', form.email);
-    formData.append('password', form.password);
-    formData.append('password_confirmation', form.password_confirmation);
-    formData.append('role', form.role);
-
-    // Append profile data
-    formData.append('profile[first_name]', form.profile.first_name);
-    formData.append('profile[last_name]', form.profile.last_name);
-    formData.append('profile[middle_name]', form.profile.middle_name || '');
-    formData.append('profile[introduction]', form.profile.introduction || '');
-
-    // Append profile image only if a new file is selected
-    if (form.profile.profile_image instanceof File) {
-      formData.append('profile[profile_image]', form.profile.profile_image);
-    }
-
-    // Append chef data if applicable
-    if (form.role === 'chef' && form.chef.income) {
-      formData.append('chef[income]', form.chef.income);
-    }
-
-    // SweetAlert2 for confirmation before form submission
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to update this user\'s information?',
@@ -171,8 +145,8 @@ const submitForm = async () => {
     });
 
     if (result.isConfirmed) {
-      await form.put(route('users.update', props.user.id), {
-        data: formData,
+      form.put(route('users.update', props.user.id), {
+        preserveScroll: true,
         onSuccess: () => {
           Swal.fire({
             title: 'Success!',
@@ -181,7 +155,8 @@ const submitForm = async () => {
             confirmButtonText: 'Okay',
           });
         },
-        onError: () => {
+        onError: (errors) => {
+          console.error(errors);
           Swal.fire({
             title: 'Error!',
             text: 'There was an error updating the user.',

@@ -145,5 +145,7 @@ onMounted(() => {
     script2.src = 'https://files.bpcontent.cloud/2024/12/16/16/20241216164133-I8MIRLQE.js';
     document.head.appendChild(script2);
   }
-});
+}); 
+
+   
 </script>

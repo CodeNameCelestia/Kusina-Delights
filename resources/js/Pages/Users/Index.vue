@@ -1,56 +1,75 @@
 <template>
   <Layout>
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-semibold text-gray-700">User List</h2>
-      <InertiaLink
-        :href="'/users/create'"
-        class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg"
-      >
-        New User
-      </InertiaLink>
-    </div>
-
-    <div class="overflow-x-auto bg-white shadow-md rounded-lg">
-      <div class="p-4 border-t">
-        <!-- Column Headers -->
-        <div class="flex mb-2 font-semibold text-gray-700">
-          <div class="flex-1">Name</div>
-          <div class="flex-1">Email</div>
-          <div class="flex-1 text-center">Actions</div>
-        </div>
-
-        <!-- Loop through users -->
-        <div
-          v-for="user in users"
-          :key="user.id"
-          class="flex justify-between items-center py-3 border-b hover:bg-gray-50"
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header section -->
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">User Management</h2>
+        <InertiaLink
+          :href="'/users/create'"
+          class="inline-flex items-center px-4 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors duration-200"
         >
-          <div class="flex-1">
-            <p class="text-lg font-medium">{{ user.name }}</p>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-500">{{ user.email }}</p>
-          </div>
-          <div class="flex-1 text-center space-x-2">
-            <InertiaLink
-              :href="'/users/' + user.id"
-              class="text-green-500 hover:text-green-700"
-            >
-              Show
-            </InertiaLink>
-            <InertiaLink
-              :href="'/users/' + user.id + '/edit'"
-              class="text-blue-500 hover:text-blue-700"
-            >
-              Edit
-            </InertiaLink>
-            <button
-              @click="submitDelete(user.id)"
-              class="text-red-500 hover:text-red-700"
-            >
-              Delete
-            </button>
-          </div>
+          <span class="mr-2">+</span> New User
+        </InertiaLink>
+      </div>
+
+      <!-- Table section -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50 transition-colors duration-200">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ user.name }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ user.email }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <!-- Role badge with different colors based on role -->
+                  <span 
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    :class="{
+                      'bg-red-100 text-red-800': user.Roles === 'admin',
+                      'bg-yellow-100 text-yellow-800': user.Roles === 'chef',
+                      'bg-green-100 text-green-800': user.Roles === 'user'
+                    }"
+                  >
+                    {{ user.Roles }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <div class="flex items-center justify-center space-x-4">
+                    <InertiaLink
+                      :href="`/users/${user.id}`"
+                      class="text-blue-600 hover:text-blue-900"
+                    >
+                      View
+                    </InertiaLink>
+                    <InertiaLink
+                      :href="`/users/${user.id}/edit`"
+                      class="text-orange-600 hover:text-orange-900"
+                    >
+                      Edit
+                    </InertiaLink>
+                    <button
+                      @click="submitDelete(user.id)"
+                      class="text-red-600 hover:text-red-900"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

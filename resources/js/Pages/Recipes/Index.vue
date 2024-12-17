@@ -1,44 +1,73 @@
 <template>
   <Layout>
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-semibold text-gray-700">Recipes</h2>
-      <InertiaLink :href="'/recipes/create'" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">New Recipe</InertiaLink>
-    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Enhanced header section -->
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Recipes</h2>
+        <InertiaLink
+          :href="'/recipes/create'"
+          class="inline-flex items-center px-4 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors duration-200"
+        >
+          <span class="mr-2">+</span> New Recipe
+        </InertiaLink>
+      </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-      <div class="p-4 border-t">
-        <!-- Column Headers -->
-        <div class="flex mb-2 font-semibold text-gray-700">
-          <div class="flex-1">Recipe Title</div>
-          <div class="flex-1">Chef</div>
-          <div class="flex-1">Cooking Time</div>
-          <div class="flex-1">Servings</div>
-          <div class="flex-1 text-center">Actions</div>
-        </div>
+      <!-- Enhanced table section -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipe Title</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chef</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cooking Time</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Servings</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <!-- Enhanced row styling -->
+              <tr v-for="recipe in recipes" :key="recipe.RecipeID" class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <p class="text-lg font-medium">{{ recipe.RecipeTitle }}</p>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <p class="text-sm text-gray-500">{{ recipe.chef?.user?.name || 'Unknown Chef' }}</p>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <p class="text-sm">{{ recipe.CookingTime }} min</p>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <p class="text-sm">{{ recipe.Servings }} servings</p>
+                </td>
 
-        <!-- Check if recipes exist and loop over them -->
-        <div v-if="recipes.length > 0" v-for="recipe in recipes" :key="recipe.RecipeID" class="flex justify-between items-center py-3 border-b">
-          <div class="flex-1">
-            <p class="text-lg font-medium">{{ recipe.RecipeTitle }}</p>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-500">{{ recipe.chef?.user?.name || 'Unknown Chef' }}</p>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm">{{ recipe.CookingTime }} min</p>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm">{{ recipe.Servings }} servings</p>
-          </div>
-          <div class="flex-1 text-center">
-            <InertiaLink :href="'/recipes/' + recipe.RecipeID + '/edit'" class="text-blue-500 hover:text-blue-700">Edit</InertiaLink>
-            <InertiaLink :href="'/recipes/' + recipe.RecipeID + '/show'" class="text-gray-500 hover:text-gray-700">View</InertiaLink>
-            <form :action="route('recipes.destroy', recipe.RecipeID)" method="POST" @submit.prevent="deleteRecipe(recipe.RecipeID)">
-              <InertiaLink class="text-red-600 hover:text-red-800 cursor-pointer" @click="deleteRecipe(recipe.RecipeID)">
-                Delete
-              </InertiaLink>
-            </form>
-          </div>
+                <!-- Similar styling for other columns -->
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex space-x-3 justify-end">
+                    <InertiaLink
+                      :href="`/api/recipes/${recipe.RecipeID}`"
+                      class="text-blue-600 hover:text-blue-900 cursor-pointer"
+                    >
+                      View
+                    </InertiaLink>
+                    <InertiaLink
+                      :href="`/recipes/${recipe.RecipeID}/edit`"
+                      class="text-orange-600 hover:text-orange-900"
+                    >
+                      Edit
+                    </InertiaLink>
+
+                    <button
+                      @click="deleteRecipe(recipe.RecipeID)"
+                      class="text-red-600 hover:text-red-900"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

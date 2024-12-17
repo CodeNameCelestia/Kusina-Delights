@@ -98,21 +98,27 @@ import { useForm } from '@inertiajs/inertia-vue3';
 import Swal from 'sweetalert2'; // Import SweetAlert2
 
 const props = defineProps({
-  recipe: Object,
-  chefs: Array,
+  recipe: {
+    type: Object,
+    required: true
+  },
+  chefs: {
+    type: Array,
+    required: true
+  },
 });
 
 const form = useForm({
-  chef_id: props.recipe.chef_id || '',
-  RecipeTitle: props.recipe.RecipeTitle || '',
-  Description: props.recipe.Description || '',
-  Ingredients: props.recipe.Ingredients || '',
+  chef_id: props.recipe?.chef_id ?? '',
+  RecipeTitle: props.recipe?.RecipeTitle ?? '',
+  Description: props.recipe?.Description ?? '',
+  Ingredients: props.recipe?.Ingredients ?? '',
   RecipePhoto: null,
-  Instructions: props.recipe.Instructions || '',
-  Preparation: props.recipe.Preparation || '',
-  CookingTime: props.recipe.CookingTime || '',
-  Difficulty: props.recipe.Difficulty || '',
-  Servings: props.recipe.Servings || '',
+  Instructions: props.recipe?.Instructions ?? '',
+  Preparation: props.recipe?.Preparation ?? '',
+  CookingTime: props.recipe?.CookingTime ?? '',
+  Difficulty: props.recipe?.Difficulty ?? '',
+  Servings: props.recipe?.Servings ?? '',
 });
 
 const errors = ref([]);

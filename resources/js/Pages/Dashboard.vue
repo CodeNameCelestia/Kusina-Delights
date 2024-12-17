@@ -14,6 +14,13 @@ import {
     BarController,
     LineController
 } from 'chart.js';
+import { 
+    UsersIcon, 
+    BookOpenIcon, 
+    StarIcon, 
+    UserGroupIcon, 
+    ChartBarIcon 
+} from '@heroicons/vue/24/outline';
 
 // Register Chart.js components
 ChartJS.register(
@@ -105,31 +112,46 @@ onMounted(() => {
         <div class="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-6 mb-6">
             <!-- Total Users -->
             <div class="p-6 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
-                <p class="text-sm text-gray-500">Total Users</p>
+                <div class="flex items-center gap-4 mb-2">
+                    <UsersIcon class="h-6 w-6 text-orange-500" />
+                    <p class="text-sm text-gray-500">Total Users</p>
+                </div>
                 <p class="text-2xl font-bold text-gray-800">{{ totalUsers }}</p>
             </div>
 
             <!-- Posts -->
             <div class="p-6 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
-                <p class="text-sm text-gray-500">Total Recipes</p>
+                <div class="flex items-center gap-4 mb-2">
+                    <BookOpenIcon class="h-6 w-6 text-blue-500" />
+                    <p class="text-sm text-gray-500">Total Recipes</p>
+                </div>
                 <p class="text-2xl font-bold text-gray-800">{{ totalPosts }}</p>
             </div>
 
             <!-- Reviews -->
             <div class="p-6 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
-                <p class="text-sm text-gray-500">Total Reviews</p>
+                <div class="flex items-center gap-4 mb-2">
+                    <StarIcon class="h-6 w-6 text-yellow-500" />
+                    <p class="text-sm text-gray-500">Total Reviews</p>
+                </div>
                 <p class="text-2xl font-bold text-gray-800">{{ totalReviews }}</p>
             </div>
 
             <!-- Chefs -->
             <div class="p-6 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
-                <p class="text-sm text-gray-500">Total Chefs</p>
+                <div class="flex items-center gap-4 mb-2">
+                    <UserGroupIcon class="h-6 w-6 text-green-500" />
+                    <p class="text-sm text-gray-500">Total Chefs</p>
+                </div>
                 <p class="text-2xl font-bold text-gray-800">{{ totalChefs }}</p>
             </div>
 
             <!-- Views -->
             <div class="p-6 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
-                <p class="text-sm text-gray-500">Total Views</p>
+                <div class="flex items-center gap-4 mb-2">
+                    <ChartBarIcon class="h-6 w-6 text-purple-500" />
+                    <p class="text-sm text-gray-500">Total Views</p>
+                </div>
                 <p class="text-2xl font-bold text-gray-800">{{ totalViews }}</p>
             </div>
         </div>

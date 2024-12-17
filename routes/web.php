@@ -18,7 +18,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
-    $recipes = Recipe::withCount('reviews')
+    $recipes = Recipe::with('chef.user')
+        ->withCount('reviews')
         ->withAvg('reviews', 'Star')
         ->take(3)
         ->get()
@@ -30,6 +31,9 @@ Route::get('/', function () {
                 'RecipePhoto' => $recipe->RecipePhoto,
                 'averageStars' => $recipe->reviews_avg_star,
                 'reviewCount' => $recipe->reviews_count,
+                'chef' => [
+                    'name' => $recipe->chef->user->name ?? 'Unknown Chef',
+                ],
             ];
         });
 
@@ -58,6 +62,7 @@ Route::get('/storage/{file}', function ($file) {
 
 # Views and filters for front end
 Route::get('/allrecipes', [RecipeController::class, 'recipeFilter']);
+Route::get('/recipes/by-chef/{chefId?}', [RecipeController::class, 'recipesByChef']);
 Route::get('/aboutus', function () {
     return Inertia::render('Webpages/AboutUs');  // Path relative to 'resources/js/Pages/'
 });
@@ -108,6 +113,7 @@ Route::middleware(['auth', 'Roles:admin'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('recipes', RecipeController::class);
     Route::resource('reviews', ReviewController::class);
+    Route::get('/recipes/{recipe}/view', [RecipeController::class, 'viewRecipe'])->name('recipes.view');
 });
 
 

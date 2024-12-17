@@ -114,7 +114,7 @@ const form = useForm({
   Difficulty: '',
   Servings: null,
   RecipePhoto: null,
-  VideoLink: props.recipe.VideoLink || '',
+  VideoLink: '',
 });
 
 const handleFileChange = (event) => {

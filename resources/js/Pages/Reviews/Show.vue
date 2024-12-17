@@ -17,7 +17,7 @@
         <p class="text-gray-600">{{ review.Review || 'No review text provided.' }}</p>
       </div>
 
-      <InertiaLink :href="route('reviews.index')" class="mt-6 inline-block bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition">Back to List</InertiaLink>
+      <Link :href="route('reviews.index')" class="mt-6 inline-block bg-yellow-600 text-white px-6 py-2 rounded-md hover:bg-yellow-700 transition">Back to List</Link>
     </div>
   </Layout>
 </template>
@@ -26,6 +26,8 @@
 import Layout from '../../Layouts/backend.vue';
 import { Inertia } from '@inertiajs/inertia';  // Import Inertia for handling the delete request
 import { defineProps } from 'vue';
+import { Link } from '@inertiajs/vue3';
+
 
 const props = defineProps({
   review: Object,

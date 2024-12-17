@@ -7,7 +7,8 @@ use App\Models\Chef;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;  // Import the Log facade
+use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Facades\Auth;
 
 class RecipeController extends Controller
 {
@@ -60,10 +61,10 @@ class RecipeController extends Controller
 
     public function show(Recipe $recipe)
     {
-        $chefs = Chef::with('user')->get();
+        $recipe->load(['chef.user']); // Eager load the relationships
+        
         return Inertia::render('Recipes/Show', [
-            'recipe' => $recipe->toArray(), // Make sure this includes all fields, especially 'id'
-            'chefs' => $chefs,
+            'recipe' => $recipe
         ]);
     }
 
@@ -71,9 +72,10 @@ class RecipeController extends Controller
     // Show the form to edit an existing recipe
     public function edit(Recipe $recipe)
     {
+        $recipe->load('chef.user');  // Eager load the relationships
         $chefs = Chef::with('user')->get();
         return Inertia::render('Recipes/Edit', [
-            'recipe' => $recipe->toArray(), // Make sure this includes all fields, especially 'id'
+            'recipe' => $recipe,
             'chefs' => $chefs,
         ]);
     }
@@ -179,17 +181,20 @@ class RecipeController extends Controller
 
     public function recipeFilter()
     {
-        // Fetch Famous Filipino Delights: Recipes with highest average rating and reviews
+        // Get all chefs for the dropdown
+        $chefs = Chef::with('user')->get();
+
+        // Fetch Famous Filipino Delights
         $famousDelights = Recipe::withCount('reviews')
-            ->withAvg('reviews', 'star') // Get average rating
-            ->with('chef.user') // Include the chef and user relationship
+            ->withAvg('reviews', 'star')
+            ->with('chef.user')
             ->orderByDesc('reviews_count')
-            ->orderByDesc('reviews_avg_star') // First by reviews count, then by average rating
-            ->take(3) // Limit to top 3
+            ->orderByDesc('reviews_avg_star')
+            ->take(3)
             ->get();
 
-        // Fetch Recent Recipes: Sorted by creation date (most recent first)
-        $recentRecipes = Recipe::with('chef.user') // Include the chef and user relationship
+        // Fetch Recent Recipes
+        $recentRecipes = Recipe::with('chef.user')
             ->latest()
             ->take(4)
             ->get();
@@ -197,6 +202,46 @@ class RecipeController extends Controller
         return Inertia::render('Webpages/Recipes', [
             'famousDelights' => $famousDelights,
             'recentRecipes' => $recentRecipes,
+            'chefs' => $chefs,
+        ]);
+    }
+
+    // Add this new method
+    public function recipesByChef($chefId = null)
+    {
+        $query = Recipe::with('chef.user')
+            ->withCount('reviews')
+            ->withAvg('reviews', 'star')
+            ->when($chefId, function ($query) use ($chefId) {
+                return $query->where('chef_id', $chefId);
+            });
+        
+        $recipes = $query->get();
+        
+        // Transform the data to match the expected format
+        $recipes = $recipes->map(function ($recipe) {
+            return [
+                'RecipeID' => $recipe->RecipeID,
+                'RecipeTitle' => $recipe->RecipeTitle,
+                'Description' => $recipe->Description,
+                'RecipePhoto' => $recipe->RecipePhoto,
+                'chef' => $recipe->chef,
+                'reviews_count' => $recipe->reviews_count,
+                'reviews_avg_star' => $recipe->reviews_avg_star,
+            ];
+        });
+
+        return response()->json($recipes);
+    }
+
+    public function viewRecipe(Recipe $recipe)
+    {
+        $recipe->load(['chef.user', 'reviews.user']); // Eager load relationships
+        
+        return Inertia::render('Webpages/ViewRecipe', [
+            'recipe' => $recipe,
+            'viewCount' => $recipe->views ?? 0,
+            'user' => Auth::user()
         ]);
     }
 

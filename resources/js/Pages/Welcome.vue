@@ -59,6 +59,7 @@
               <div class="flex flex-col justify-between h-full">
                 <div>
                   <h2 class="text-large font-semibold text-gray-800">{{ recipe.RecipeTitle }}</h2>
+                  <p class="text-sm text-gray-500">By {{ recipe.chef.name }}</p>
                   <p class="mt-2 text-gray-600 text-small line-clamp-3 text-justify">
                     {{ recipe.Description || 'No description available.' }}
                   </p>

@@ -1,46 +1,56 @@
 <script setup>
 import Layout from '../Layouts/backend.vue';
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
-import { Chart } from 'chart.js';
+import { onMounted } from 'vue';
+import { 
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    BarController,
+    LineController
+} from 'chart.js';
 
-// Reactive variables for the statistics
-const totalUsers = ref(0); // Changed from totalViews
-const totalPosts = ref(0);
-const totalReviews = ref(0);
-const totalChefs = ref(0);
+// Register Chart.js components
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    BarController,
+    LineController,
+    Title,
+    Tooltip,
+    Legend
+);
 
-// Reactive variable for the users per day of the week
-const usersPerDay = ref([]);
+// Define props
+const props = defineProps({
+    totalUsers: Number,
+    totalPosts: Number,
+    totalReviews: Number,
+    totalChefs: Number,
+    totalViews: Number,
+    usersPerDay: Array,
+    viewsPerDay: Array,
+});
 
-// Fetch statistics from the backend
-const fetchDashboardData = async () => {
-    try {
-        const response = await axios.get('/dashboard-data');
-        totalUsers.value = response.data.totalUsers;
-        totalPosts.value = response.data.totalPosts;
-        totalReviews.value = response.data.totalReviews;
-        totalChefs.value = response.data.totalChefs;
-
-        // Fetch the users per day of the week data
-        usersPerDay.value = response.data.usersPerDay; // Assuming this is an array of user counts for each day
-        drawChart();
-    } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-    }
-};
-
-// Function to draw the chart
-const drawChart = () => {
+// Function to draw the users chart
+const drawUsersChart = () => {
     const ctx = document.getElementById('usersChart').getContext('2d');
-    new Chart(ctx, {
+    new ChartJS(ctx, {
         type: 'bar',
         data: {
-            labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], // Days of the week
+            labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             datasets: [{
                 label: 'Total Users per Day',
-                data: usersPerDay.value, // Data fetched from backend
-                backgroundColor: 'rgba(255, 159, 64, 0.2)', // Bar color
+                data: props.usersPerDay,
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
                 borderColor: 'rgba(255, 159, 64, 1)',
                 borderWidth: 1,
             }]
@@ -56,15 +66,43 @@ const drawChart = () => {
     });
 };
 
+// Function to draw the views chart
+const drawViewsChart = () => {
+    const ctx = document.getElementById('viewsChart').getContext('2d');
+    new ChartJS(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            datasets: [{
+                label: 'Recipe Views per Day',
+                data: props.viewsPerDay,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+};
+
 onMounted(() => {
-    fetchDashboardData();
+    drawUsersChart();
+    drawViewsChart();
 });
 </script>
 
 <template>
     <Layout>
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-6 mb-6">
             <!-- Total Users -->
             <div class="p-6 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
                 <p class="text-sm text-gray-500">Total Users</p>
@@ -88,12 +126,27 @@ onMounted(() => {
                 <p class="text-sm text-gray-500">Total Chefs</p>
                 <p class="text-2xl font-bold text-gray-800">{{ totalChefs }}</p>
             </div>
+
+            <!-- Views -->
+            <div class="p-6 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                <p class="text-sm text-gray-500">Total Views</p>
+                <p class="text-2xl font-bold text-gray-800">{{ totalViews }}</p>
+            </div>
         </div>
 
-        <!-- Graph (Chart.js) -->
-        <div class="p-6 bg-white rounded-lg shadow-lg mt-6">
-            <h3 class="text-lg font-semibold text-gray-800">Users Per Day of the Week</h3>
-            <canvas id="usersChart" height="200"></canvas>
+        <!-- Graphs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Users Graph -->
+            <div class="p-6 bg-white rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-800">Users Per Day of the Week</h3>
+                <canvas id="usersChart" height="200"></canvas>
+            </div>
+
+            <!-- Views Graph -->
+            <div class="p-6 bg-white rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-800">Recipe Views Per Day of the Week</h3>
+                <canvas id="viewsChart" height="200"></canvas>
+            </div>
         </div>
     </Layout>
 </template>

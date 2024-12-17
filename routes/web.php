@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     $recipes = Recipe::withCount('reviews')
@@ -101,13 +102,14 @@ Route::middleware(['auth', 'Roles:user,chef,admin'])->group(function () {
 
 #Admin Dashboard
 Route::middleware(['auth', 'Roles:admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
+    
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::resource('users', UserController::class);
     Route::resource('recipes', RecipeController::class);
     Route::resource('reviews', ReviewController::class);
 });
+
 
 
 

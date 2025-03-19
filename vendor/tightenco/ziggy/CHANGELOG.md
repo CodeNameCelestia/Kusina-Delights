@@ -8,6 +8,35 @@ Breaking changes are marked with ⚠️.
 
 ## [Unreleased]
 
+## [v2.5.1] - 2025-01-31
+
+**Fixed**
+
+* Fix `current()` type in strict mode by @bakerkretzmar in https://github.com/tighten/ziggy/pull/809
+
+## [v2.5.0] - 2025-01-22
+
+**Added**
+
+- Support passing except/only args to ziggy command by @joshmanders in https://github.com/tighten/ziggy/pull/805
+
+**Fixed**
+
+* Redefine `ParsedQs` type by @bakerkretzmar in https://github.com/tighten/ziggy/pull/806
+* Only limit route names when calling route() by @simon-tma in https://github.com/tighten/ziggy/pull/790
+
+## [v2.4.2] - 2025-01-02
+
+**Fixed**
+
+- Fix deprecated implictly nullable parameter by @datlechin in https://github.com/tighten/ziggy/pull/792
+
+## [v2.4.1] - 2024-11-21
+
+**Fixed**
+
+- Fix `qs` type dependencies
+
 ## [v2.4.0] - 2024-11-09
 
 **Added**
@@ -445,8 +474,12 @@ See [UPGRADING](UPGRADING.md#upgrading-from-1x-to-2x) for detailed upgrade instr
 
 For previous changes see the [Releases](https://github.com/tighten/ziggy/releases) page.
 
-[Unreleased]: https://github.com/tighten/ziggy/compare/v2.4.0...HEAD
-[v2.3.1]: https://github.com/tighten/ziggy/compare/v2.3.1...v2.4.0
+[Unreleased]: https://github.com/tighten/ziggy/compare/v2.5.1...HEAD
+[v2.5.1]: https://github.com/tighten/ziggy/compare/v2.5.0...v2.5.1
+[v2.5.0]: https://github.com/tighten/ziggy/compare/v2.4.2...v2.5.0
+[v2.4.2]: https://github.com/tighten/ziggy/compare/v2.4.1...v2.4.2
+[v2.4.1]: https://github.com/tighten/ziggy/compare/v2.4.0...v2.4.1
+[v2.4.0]: https://github.com/tighten/ziggy/compare/v2.3.1...v2.4.0
 [v2.3.1]: https://github.com/tighten/ziggy/compare/v2.3.0...v2.3.1
 [v2.3.0]: https://github.com/tighten/ziggy/compare/v2.2.1...v2.3.0
 [v2.2.1]: https://github.com/tighten/ziggy/compare/v2.2.0...v2.2.1
